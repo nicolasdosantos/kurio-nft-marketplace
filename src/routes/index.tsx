@@ -1,21 +1,29 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { catalogSearchSchema, type CatalogSearch } from '@/lib/catalog-search'
+import { CatalogPage } from '@/pages/CatalogPage'
 
-// Placeholder até a home real do Figma.
 export const Route = createFileRoute('/')({
-  component: HomePlaceholder,
+  validateSearch: (search) => catalogSearchSchema.parse(search),
+  component: CatalogRoute,
 })
 
-function HomePlaceholder() {
+function CatalogRoute() {
+  const search = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  function handleFiltersChange(changes: Partial<CatalogSearch>) {
+    navigate({ search: (previous) => ({ ...previous, ...changes, page: undefined }) })
+  }
+
+  function handlePageChange(page: number) {
+    navigate({ search: (previous) => ({ ...previous, page: page > 1 ? page : undefined }) })
+  }
+
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-4">
-      <h1 className="text-heading font-bold text-text-accent">Kurio</h1>
-      <Link
-        to="/poc/$nftId"
-        params={{ nftId: 'emerald-ape-042' }}
-        className="text-text-secondary underline underline-offset-4"
-      >
-        Abrir PoC de tempo real
-      </Link>
-    </main>
+    <CatalogPage
+      search={search}
+      onFiltersChange={handleFiltersChange}
+      onPageChange={handlePageChange}
+    />
   )
 }

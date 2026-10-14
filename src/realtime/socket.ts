@@ -10,3 +10,10 @@ export const socket = io(socketUrl, {
   // Tentativa de conexão travada não deve segurar a reconexão por 20s (o padrão).
   timeout: 5000,
 })
+
+// O token vai na query porque o mock não recebe o `auth` do handshake.
+export function connectSocket(token: string | null) {
+  socket.disconnect()
+  socket.io.opts.query = token ? { token } : {}
+  socket.connect()
+}

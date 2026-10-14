@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { AppHeader } from '@/components/AppHeader'
+import { useAnnouncement } from '@/realtime/announcements'
 import { useRealtimeSync } from '@/realtime/useRealtimeSync'
 
 export interface RouterContext {
@@ -22,10 +24,15 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 
 function RootLayout() {
   useRealtimeSync()
+  const announcement = useAnnouncement()
 
   return (
     <>
+      <AppHeader />
       <Outlet />
+      <p role="status" aria-live="polite" data-testid="realtime-announcement" className="sr-only">
+        {announcement}
+      </p>
       <Suspense>
         <Devtools />
         <MockPanel />
@@ -36,7 +43,7 @@ function RootLayout() {
 
 function NotFoundPage() {
   return (
-    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-4 text-center">
+    <main className="flex min-h-[60dvh] flex-col items-center justify-center gap-4 p-4 text-center">
       <h1 className="text-heading font-bold text-text-accent">Página não encontrada</h1>
       <Link to="/" className="text-text-secondary underline underline-offset-4">
         Voltar para o início
