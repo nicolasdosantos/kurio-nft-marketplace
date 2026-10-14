@@ -1,32 +1,28 @@
-# React + TypeScript + Vite
+# Kurio — Marketplace de NFTs
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Marketplace de NFTs em React + TypeScript com APIs, autenticação e tempo real simulados com MSW.
 
-Currently, two official plugins are available:
+Demo: https://kurio-nft-marketplace-eta.vercel.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+> Em desenvolvimento. Este README vai ganhar setup completo, cenários dos mocks e credenciais de teste.
 
-## React Compiler
+## Rodando localmente
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Requer Node 20+ e pnpm.
 
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+pnpm install
+pnpm dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+## Scripts
+
+| Comando | O que faz |
+| --- | --- |
+| `pnpm dev` | servidor de desenvolvimento com mocks |
+| `pnpm build` | build de produção |
+| `pnpm preview` | serve o build localmente |
+| `pnpm typecheck` | verificação de tipos |
+| `pnpm lint` | ESLint |
+| `pnpm test:e2e` | testes Playwright (use `BASE_URL=<url>` para rodar contra um deploy) |
+| `pnpm lighthouse` | auditoria Lighthouse |
