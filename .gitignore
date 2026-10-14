@@ -29,6 +29,6 @@ test-results
 blob-report
 playwright/.cache
 .lighthouseci
-.env
+.env.local
 .env.*.local
 .vercel

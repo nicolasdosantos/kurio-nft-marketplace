@@ -1,34 +1,25 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { QueryClientProvider } from '@tanstack/react-query'
-import { createRouter, RouterProvider } from '@tanstack/react-router'
 import '@fontsource/roboto-mono/400.css'
 import '@fontsource/roboto-mono/500.css'
 import '@fontsource/roboto-mono/700.css'
 import './index.css'
-import { queryClient } from './lib/query-client'
-import { routeTree } from './routeTree.gen'
 
-const router = createRouter({
-  routeTree,
-  context: { queryClient },
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-})
+async function startMocks() {
+  if (import.meta.env.VITE_ENABLE_MOCKS !== 'true') return
 
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
+  const { worker } = await import('./mocks/browser')
+  await worker.start({
+    onUnhandledRequest: 'bypass',
+    quiet: import.meta.env.PROD,
+  })
 }
 
 const rootElement = document.getElementById('root')
 if (!rootElement) throw new Error('Root element #root not found')
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>
-  </StrictMode>,
-)
+// O app é importado só depois do worker pronto: o engine.io-client guarda o
+// `WebSocket` global ao carregar o módulo, e precisa pegar a versão já
+// interceptada pelo MSW. Também evita requisições escapando dos mocks.
+startMocks().then(async () => {
+  const { renderApp } = await import('./app')
+  renderApp(rootElement)
+})

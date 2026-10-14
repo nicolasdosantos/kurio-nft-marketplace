@@ -1,14 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
-// Temporary placeholder for the setup phase; the real home page comes in a later phase.
+// Placeholder até a home real do Figma.
 export const Route = createFileRoute('/')({
-  component: SetupCheck,
+  component: HomePlaceholder,
 })
 
-function SetupCheck() {
+function HomePlaceholder() {
   return (
-    <main className="flex min-h-dvh items-center justify-center bg-ink font-mono text-text-primary">
-      <h1 className="text-heading font-bold text-text-accent">Kurio — setup OK</h1>
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-4 p-4">
+      <h1 className="text-heading font-bold text-text-accent">Kurio</h1>
+      <Link
+        to="/poc/$nftId"
+        params={{ nftId: 'nft-1' }}
+        className="text-text-secondary underline underline-offset-4"
+      >
+        Abrir PoC de tempo real
+      </Link>
     </main>
   )
 }
