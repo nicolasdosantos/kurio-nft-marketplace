@@ -49,7 +49,8 @@ test.describe('PoC de tempo real (MSW + Socket.IO)', () => {
     )
     await page.getByRole('button', { name: 'Restaurar conexão' }).click()
 
-    await expect(page.getByTestId('socket-status')).toHaveText('conectado')
+    // O cliente está em backoff de reconexão (até ~4,5s com o jitter do socket.io).
+    await expect(page.getByTestId('socket-status')).toHaveText('conectado', { timeout: 10_000 })
     await refetch
     await expect(page.getByTestId('nft-price')).toHaveText('2.09 ETH')
     await expect(page.getByTestId('nft-version')).toHaveText('2')

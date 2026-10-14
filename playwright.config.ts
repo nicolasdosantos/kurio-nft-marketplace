@@ -2,6 +2,9 @@ import { defineConfig, devices } from '@playwright/test'
 
 const PORT = 4173
 
+// Com BASE_URL os testes rodam contra um deploy (ex.: a URL da Vercel) em vez do preview local.
+const externalBaseUrl = process.env.BASE_URL
+
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
@@ -9,7 +12,7 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],
   use: {
-    baseURL: `http://localhost:${PORT}`,
+    baseURL: externalBaseUrl ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
@@ -24,10 +27,12 @@ export default defineConfig({
     },
   ],
   // Tests run against the optimized build with mocks enabled.
-  webServer: {
-    command: `pnpm build && pnpm preview --port ${PORT} --strictPort`,
-    port: PORT,
-    reuseExistingServer: !process.env.CI,
-    timeout: 180_000,
-  },
+  webServer: externalBaseUrl
+    ? undefined
+    : {
+        command: `pnpm build && pnpm preview --port ${PORT} --strictPort`,
+        port: PORT,
+        reuseExistingServer: !process.env.CI,
+        timeout: 180_000,
+      },
 })
