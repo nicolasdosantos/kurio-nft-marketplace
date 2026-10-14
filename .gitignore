@@ -29,6 +29,8 @@ test-results
 blob-report
 playwright/.cache
 .lighthouseci
+
+# Env locais (o .env com flags públicas continua versionado)
 .env.local
-.env.*.local
+.env*.local
 .vercel
