@@ -56,6 +56,7 @@ const STORAGE_KEY = 'kurio:mock-scenario'
 
 let state: ScenarioState = createState('default')
 let requestCounter = 0
+let listRequestCounter = 0
 
 function createState(name: ScenarioName, seed = 42): ScenarioState {
   return { name, seed, faults: [], checkoutTrapUsed: false }
@@ -92,6 +93,7 @@ export function getScenario() {
 export function setScenario(name: ScenarioName, seed?: number) {
   state = createState(name, seed)
   requestCounter = 0
+  listRequestCounter = 0
   persist()
 }
 
@@ -151,7 +153,8 @@ export function latencyFor(method: string, pathname: string) {
     case 'out-of-order':
       // Na listagem, as requisições ímpares demoram mais que as pares seguintes.
       if (method === 'GET' && pathname === '/api/nfts') {
-        return requestCounter % 2 === 1 ? 1500 : 150
+        listRequestCounter += 1
+        return listRequestCounter % 2 === 1 ? 1500 : 150
       }
       return 150
     default:

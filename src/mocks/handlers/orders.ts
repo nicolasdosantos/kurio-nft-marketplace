@@ -1,7 +1,14 @@
 import Decimal from 'decimal.js'
 import { http, HttpResponse } from 'msw'
 import { createOrderRequestSchema } from '@/api/contracts/orders'
-import { buildQuote, getCart, quotesMatch, toPublicQuote, userCartKey } from '../cart-logic'
+import {
+  buildQuote,
+  getCart,
+  quotesMatch,
+  saveQuote,
+  toPublicQuote,
+  userCartKey,
+} from '../cart-logic'
 import { findNft, getDb, saveDb, type StoredOrder } from '../db'
 import {
   PAYMENT_PROCESSING_MS,
@@ -83,8 +90,7 @@ export const orderHandlers = [
     const quoteExpired = !savedQuote || Date.parse(savedQuote.expiresAt) <= Date.now()
 
     if (quoteExpired || !quotesMatch(savedQuote, freshQuote)) {
-      db.quotes = db.quotes.filter((quote) => quote.cartKey !== cartKey)
-      db.quotes.push(freshQuote)
+      saveQuote(freshQuote)
       saveDb()
       return errorResponse(
         409,

@@ -207,3 +207,12 @@ export function toPublicQuote(quote: StoredQuote): Quote {
     totalEth: quote.totalEth,
   }
 }
+
+// Guarda a cotação sem apagar as anteriores ainda válidas: a tela pode estar
+// usando uma cotação de alguns segundos atrás, e ela continua valendo até expirar.
+export function saveQuote(quote: StoredQuote) {
+  const db = getDb()
+  const now = Date.now()
+  db.quotes = db.quotes.filter((item) => Date.parse(item.expiresAt) > now)
+  db.quotes.push(quote)
+}

@@ -14,9 +14,10 @@ import {
   maxQuantityFor,
   resolveCartKey,
   toCartResponse,
+  saveQuote,
   toPublicQuote,
 } from '../cart-logic'
-import { getDb, saveDb } from '../db'
+import { saveDb } from '../db'
 import { errorResponse, notFound, readBody } from '../responses'
 
 function outOfStock(available: number) {
@@ -143,10 +144,7 @@ export const cartHandlers = [
     if (parsed.response) return parsed.response
 
     const quote = buildQuote(cartKey, parsed.body.network)
-    const db = getDb()
-    // Guarda só a cotação mais recente de cada carrinho.
-    db.quotes = db.quotes.filter((item) => item.cartKey !== cartKey)
-    db.quotes.push(quote)
+    saveQuote(quote)
     saveDb()
 
     return HttpResponse.json(toPublicQuote(quote))
