@@ -7,4 +7,6 @@ export const socket = io(socketUrl, {
   autoConnect: false,
   reconnectionDelay: 500,
   reconnectionDelayMax: 3000,
+  // Tentativa de conexão travada não deve segurar a reconexão por 20s (o padrão).
+  timeout: 5000,
 })

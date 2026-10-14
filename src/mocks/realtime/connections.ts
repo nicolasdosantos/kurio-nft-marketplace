@@ -27,7 +27,8 @@ const PING_INTERVAL_MS = 20_000
 
 export const realtimeHandler = realtimeLink.addEventListener('connection', (connection) => {
   if (offline) {
-    connection.client.close()
+    // Fechar no mesmo tick da abertura às vezes deixava o socket preso em "connecting".
+    setTimeout(() => connection.client.close(), 0)
     return
   }
 
