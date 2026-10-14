@@ -1,6 +1,7 @@
 import type { QueryClient } from '@tanstack/react-query'
+import type { NftUpdatedEvent } from '@/api/contracts/events'
+import type { Nft } from '@/api/contracts/nfts'
 import { nftKeys } from '@/api/nfts'
-import type { Nft, NftUpdatedEvent } from '@/api/types'
 
 export type NftEventOutcome = 'applied' | 'ignored-stale' | 'ignored-not-cached'
 
@@ -19,7 +20,8 @@ export function onNftEventProcessed(listener: (entry: NftEventLogEntry) => void)
 }
 
 export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent) {
-  const cachedNft = queryClient.getQueryData<Nft>(nftKeys.detail(event.resourceId))
+  const nftId = event.resource.id
+  const cachedNft = queryClient.getQueryData<Nft>(nftKeys.detail(nftId))
 
   let outcome: NftEventOutcome
   if (!cachedNft) {
@@ -28,9 +30,14 @@ export function applyNftUpdated(queryClient: QueryClient, event: NftUpdatedEvent
     // Duplicado ou fora de ordem: nunca regredir para um estado mais antigo.
     outcome = 'ignored-stale'
   } else {
-    queryClient.setQueryData<Nft>(nftKeys.detail(event.resourceId), {
+    queryClient.setQueryData<Nft>(nftKeys.detail(nftId), {
       ...cachedNft,
-      ...event.changes,
+      priceEth: event.data.priceEth,
+      originalPriceEth: event.data.originalPriceEth,
+      editions: cachedNft.editions.map((edition) => ({
+        ...edition,
+        stock: event.data.editions.find((item) => item.id === edition.id)?.stock ?? edition.stock,
+      })),
       version: event.version,
     })
     outcome = 'applied'

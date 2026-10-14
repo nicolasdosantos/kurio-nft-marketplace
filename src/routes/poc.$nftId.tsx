@@ -2,12 +2,8 @@ import { useEffect, useState } from 'react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { isAxiosError } from 'axios'
-import {
-  nftDetailQuery,
-  raiseNftPriceOnServer,
-  replayNftEvent,
-  setRealtimeOnline,
-} from '@/api/nfts'
+import { raiseNftPrice, replayNftEvent, setRealtimeOnline } from '@/api/mock-control'
+import { nftDetailQuery } from '@/api/nfts'
 import { Button } from '@/components/ui/button'
 import { onNftEventProcessed, type NftEventLogEntry } from '@/realtime/nft-updates'
 import { useSocketStatus } from '@/realtime/useSocketStatus'
@@ -30,13 +26,13 @@ function RealtimePocPage() {
 
   useEffect(() => {
     return onNftEventProcessed((entry) => {
-      if (entry.event.resourceId === nftId) {
+      if (entry.event.resource.id === nftId) {
         setEventLog((previous) => [entry, ...previous])
       }
     })
   }, [nftId])
 
-  const raisePrice = useMutation({ mutationFn: () => raiseNftPriceOnServer(nftId) })
+  const raisePrice = useMutation({ mutationFn: () => raiseNftPrice(nftId) })
   const replayEvent = useMutation({
     mutationFn: (which: 'last' | 'previous') => replayNftEvent(nftId, which),
   })
@@ -111,7 +107,7 @@ function RealtimePocPage() {
           <ol data-testid="event-log" className="flex flex-col gap-1 text-body-sm">
             {eventLog.map((entry, index) => (
               <li key={`${entry.event.eventId}-${index}`}>
-                v{entry.event.version} · {entry.event.changes.priceEth} ETH ·{' '}
+                v{entry.event.version} · {entry.event.data.priceEth} ETH ·{' '}
                 {outcomeLabels[entry.outcome]}
               </li>
             ))}

@@ -6,11 +6,8 @@ import './index.css'
 async function startMocks() {
   if (import.meta.env.VITE_ENABLE_MOCKS !== 'true') return
 
-  const { worker } = await import('./mocks/browser')
-  await worker.start({
-    onUnhandledRequest: 'bypass',
-    quiet: import.meta.env.PROD,
-  })
+  const { startMockServer } = await import('./mocks/browser')
+  await startMockServer()
 }
 
 const rootElement = document.getElementById('root')

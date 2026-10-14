@@ -23,6 +23,8 @@ export default defineConfig({
     },
     {
       name: 'mobile-chromium',
+      // Os testes da API simulada não dependem do viewport.
+      testIgnore: '**/api/**',
       use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
     },
   ],

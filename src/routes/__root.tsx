@@ -10,6 +10,11 @@ export interface RouterContext {
 // Devtools só em dev, para não entrar no bundle de produção.
 const Devtools = import.meta.env.DEV ? lazy(() => import('@/lib/devtools')) : () => null
 
+const MockPanel =
+  import.meta.env.VITE_ENABLE_MOCKS === 'true'
+    ? lazy(() => import('@/components/MockPanel').then((module) => ({ default: module.MockPanel })))
+    : () => null
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
   notFoundComponent: NotFoundPage,
@@ -23,6 +28,7 @@ function RootLayout() {
       <Outlet />
       <Suspense>
         <Devtools />
+        <MockPanel />
       </Suspense>
     </>
   )

@@ -11,7 +11,7 @@ function HomePlaceholder() {
       <h1 className="text-heading font-bold text-text-accent">Kurio</h1>
       <Link
         to="/poc/$nftId"
-        params={{ nftId: 'nft-1' }}
+        params={{ nftId: 'emerald-ape-042' }}
         className="text-text-secondary underline underline-offset-4"
       >
         Abrir PoC de tempo real

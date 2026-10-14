@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { nftKeys } from '@/api/nfts'
-import type { NftUpdatedEvent } from '@/api/types'
+import type { NftUpdatedEvent } from '@/api/contracts/events'
 import { applyNftUpdated } from './nft-updates'
 import { socket } from './socket'
 

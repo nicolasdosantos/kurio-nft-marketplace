@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
+import type { Nft } from './contracts/nfts'
 import { http } from './http'
-import type { Nft, NftUpdatedEvent } from './types'
 
 export const nftKeys = {
   all: ['nfts'] as const,
@@ -17,18 +17,4 @@ export function nftDetailQuery(nftId: string) {
     queryKey: nftKeys.detail(nftId),
     queryFn: ({ signal }) => fetchNft(nftId, signal),
   })
-}
-
-// Só existem para a página da PoC: controlam o "servidor" simulado.
-export async function raiseNftPriceOnServer(nftId: string) {
-  const response = await http.post<NftUpdatedEvent>(`/mock-control/nfts/${nftId}/raise-price`)
-  return response.data
-}
-
-export async function replayNftEvent(nftId: string, which: 'last' | 'previous') {
-  await http.post(`/mock-control/nfts/${nftId}/replay-event`, { which })
-}
-
-export async function setRealtimeOnline(online: boolean) {
-  await http.post(`/mock-control/realtime/${online ? 'online' : 'offline'}`)
 }

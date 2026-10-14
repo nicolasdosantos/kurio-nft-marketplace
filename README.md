@@ -17,12 +17,12 @@ pnpm dev
 
 ## Scripts
 
-| Comando | O que faz |
-| --- | --- |
-| `pnpm dev` | servidor de desenvolvimento com mocks |
-| `pnpm build` | build de produção |
-| `pnpm preview` | serve o build localmente |
-| `pnpm typecheck` | verificação de tipos |
-| `pnpm lint` | ESLint |
-| `pnpm test:e2e` | testes Playwright (use `BASE_URL=<url>` para rodar contra um deploy) |
-| `pnpm lighthouse` | auditoria Lighthouse |
+| Comando           | O que faz                                                            |
+| ----------------- | -------------------------------------------------------------------- |
+| `pnpm dev`        | servidor de desenvolvimento com mocks                                |
+| `pnpm build`      | build de produção                                                    |
+| `pnpm preview`    | serve o build localmente                                             |
+| `pnpm typecheck`  | verificação de tipos                                                 |
+| `pnpm lint`       | ESLint                                                               |
+| `pnpm test:e2e`   | testes Playwright (use `BASE_URL=<url>` para rodar contra um deploy) |
+| `pnpm lighthouse` | auditoria Lighthouse                                                 |
