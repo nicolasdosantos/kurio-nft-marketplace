@@ -9,6 +9,42 @@
       name="description"
       content="Kurio: descubra, favorite e colecione NFTs de arte digital, fotografia, música e mais, com filtros por coleção, rede e preço."
     />
+    <!-- Elemento de LCP do Início: fundo do banner no mobile, arte do hero no desktop. -->
+    <link
+      rel="preload"
+      as="image"
+      href="/icons/mobile-hero-mask.svg"
+      media="(max-width: 767px)"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="/nfts/emerald-800.webp"
+      media="(min-width: 768px)"
+      fetchpriority="high"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/roboto-mono/files/roboto-mono-latin-400-normal.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/roboto-mono/files/roboto-mono-latin-500-normal.woff2"
+    />
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      crossorigin
+      href="/node_modules/@fontsource/roboto-mono/files/roboto-mono-latin-700-normal.woff2"
+    />
   </head>
   <body>
     <div id="root"></div>

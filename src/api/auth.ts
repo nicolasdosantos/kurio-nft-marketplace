@@ -9,7 +9,8 @@ import {
 import type { AuthResponse, LoginRequest, RegisterRequest, SessionResponse } from './contracts/auth'
 import { http } from './http'
 
-// Chamado antes do primeiro render: se o token salvo ainda vale, recupera o usuário.
+// Chamado ao abrir o app: se o token salvo ainda vale, recupera o usuário.
+// Sempre termina em setSession ou clearSession, o que libera quem espera a sessão.
 export async function restoreSession() {
   const { token } = getSession()
   if (!token) return

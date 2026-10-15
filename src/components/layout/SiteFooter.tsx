@@ -137,7 +137,13 @@ export function SiteFooter() {
               {socialNetworks.map((network) => (
                 <li key={network.name}>
                   <ComingSoon className="block">
-                    <img src={network.icon} alt={network.name} width={30} height={30} />
+                    <img
+                      src={network.icon}
+                      alt={network.name}
+                      width={30}
+                      height={30}
+                      loading="lazy"
+                    />
                   </ComingSoon>
                 </li>
               ))}

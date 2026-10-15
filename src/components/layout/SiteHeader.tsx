@@ -1,11 +1,12 @@
-import { useState, type FormEvent } from 'react'
+import { lazy, Suspense, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useCartCount } from '@/api/cart'
 import { Input } from '@/components/ui/input'
-import { useSocketStatus } from '@/realtime/useSocketStatus'
 import { useSession } from '@/session/session-store'
 import { ComingSoon } from './ComingSoon'
-import { UserMenu } from './UserMenu'
+
+// O menu da conta (DropdownMenu do Radix) só é baixado para quem está logado.
+const UserMenu = lazy(() => import('./UserMenu').then((module) => ({ default: module.UserMenu })))
 
 function HeaderSearch({ onDone }: { onDone: () => void }) {
   const navigate = useNavigate()
@@ -49,7 +50,6 @@ function HeaderSearch({ onDone }: { onDone: () => void }) {
 export function SiteHeader() {
   const session = useSession()
   const cartCount = useCartCount()
-  const socketConnected = useSocketStatus()
   const [searchOpen, setSearchOpen] = useState(false)
   const isHome = useRouterState({ select: (state) => state.location.pathname === '/' })
 
@@ -100,8 +100,13 @@ export function SiteHeader() {
             </span>
           </Link>
 
-          {session.user ? (
-            <UserMenu />
+          {session.restoring ? (
+            // Ainda conferindo o token salvo: reserva o lugar sem mostrar "Entrar".
+            <span aria-hidden="true" className="h-[35px] w-[100px]" />
+          ) : session.user ? (
+            <Suspense fallback={<span aria-hidden="true" className="h-[35px] w-[100px]" />}>
+              <UserMenu />
+            </Suspense>
           ) : (
             <Link
               to="/login"
@@ -115,10 +120,6 @@ export function SiteHeader() {
       </div>
       {searchOpen && <HeaderSearch onDone={() => setSearchOpen(false)} />}
       <img src="/icons/header-divider.svg" alt="" className="mt-0 h-px w-full" />
-      <span className="sr-only">
-        Tempo real:{' '}
-        <span data-testid="socket-status">{socketConnected ? 'conectado' : 'desconectado'}</span>
-      </span>
     </header>
   )
 }

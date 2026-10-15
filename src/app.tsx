@@ -4,7 +4,10 @@ import { QueryClientProvider } from '@tanstack/react-query'
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { restoreSession } from './api/auth'
 import { onSessionExpired } from './api/http'
+import { queryKeys } from './api/query-keys'
+import { startMocks } from './lib/mocks-ready'
 import { queryClient } from './lib/query-client'
+import { getSession } from './session/session-store'
 import { routeTree } from './routeTree.gen'
 
 const router = createRouter({
@@ -31,8 +34,16 @@ onSessionExpired(() => {
   }
 })
 
-export async function renderApp(rootElement: HTMLElement) {
-  await restoreSession()
+export function renderApp(rootElement: HTMLElement) {
+  // Com um token salvo, saber quem é o usuário depende da API (e as rotas privadas
+  // esperam por isso antes de renderizar): o worker sobe na hora, sem esperar a tela.
+  if (getSession().restoring) void startMocks()
+
+  // Roda em segundo plano; quem depende da sessão espera por ela (Axios e rotas privadas).
+  // O que foi buscado enquanto a sessão era conferida fica numa chave provisória.
+  void restoreSession().then(() =>
+    queryClient.removeQueries({ queryKey: queryKeys.owner('pending') }),
+  )
 
   createRoot(rootElement).render(
     <StrictMode>
@@ -41,4 +52,12 @@ export async function renderApp(rootElement: HTMLElement) {
       </QueryClientProvider>
     </StrictMode>,
   )
+
+  // O worker do MSW (o maior arquivo do app) só começa a baixar depois que a
+  // primeira tela foi pintada. onRendered vem logo após o commit do React, antes
+  // da pintura; os dois frames garantem que ela já aconteceu.
+  const stopWaiting = router.subscribe('onRendered', () => {
+    stopWaiting()
+    requestAnimationFrame(() => requestAnimationFrame(() => void startMocks()))
+  })
 }

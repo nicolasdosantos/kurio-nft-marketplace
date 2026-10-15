@@ -1,8 +1,9 @@
 import { redirect } from '@tanstack/react-router'
-import { isLoggedIn } from '@/session/session-store'
+import { isLoggedIn, waitForSessionRestore } from '@/session/session-store'
 
 // Usado no beforeLoad das rotas privadas: manda para o login lembrando onde estava.
-export function requireLogin({ location }: { location: { href: string } }) {
+export async function requireLogin({ location }: { location: { href: string } }) {
+  await waitForSessionRestore()
   if (!isLoggedIn()) {
     throw redirect({ to: '/login', search: { redirect: location.href } })
   }

@@ -1,20 +1,22 @@
-import { useEffect, useState } from 'react'
-import { socket } from './socket'
+import { useSyncExternalStore } from 'react'
+
+// Estado da conexão fora do módulo do socket, para o header não puxar o
+// socket.io-client no carregamento inicial (ele só carrega depois do MSW).
+let connected = false
+const listeners = new Set<() => void>()
+
+export function setSocketConnected(value: boolean) {
+  connected = value
+  for (const listener of listeners) listener()
+}
+
+function subscribe(listener: () => void) {
+  listeners.add(listener)
+  return () => {
+    listeners.delete(listener)
+  }
+}
 
 export function useSocketStatus() {
-  const [connected, setConnected] = useState(socket.connected)
-
-  useEffect(() => {
-    const handleConnect = () => setConnected(true)
-    const handleDisconnect = () => setConnected(false)
-
-    socket.on('connect', handleConnect)
-    socket.on('disconnect', handleDisconnect)
-    return () => {
-      socket.off('connect', handleConnect)
-      socket.off('disconnect', handleDisconnect)
-    }
-  }, [])
-
-  return connected
+  return useSyncExternalStore(subscribe, () => connected)
 }

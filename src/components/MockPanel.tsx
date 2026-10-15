@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   changeMockScenario,
@@ -10,26 +9,12 @@ import {
 import { Button } from '@/components/ui/button'
 
 // Painel só para demonstração: troca o cenário dos mocks sem mexer no código.
-export function MockPanel() {
-  const [open, setOpen] = useState(
-    () => new URLSearchParams(window.location.search).get('mockPanel') === '1',
-  )
+export function MockPanel({ onClose }: { onClose: () => void }) {
   const queryClient = useQueryClient()
-
-  useEffect(() => {
-    function handleShortcut(event: KeyboardEvent) {
-      if (event.ctrlKey && event.shiftKey && event.key.toLowerCase() === 'm') {
-        setOpen((current) => !current)
-      }
-    }
-    window.addEventListener('keydown', handleShortcut)
-    return () => window.removeEventListener('keydown', handleShortcut)
-  }, [])
 
   const scenarioQuery = useQuery({
     queryKey: ['mock-control', 'scenario'],
     queryFn: fetchMockScenario,
-    enabled: open,
   })
 
   // Depois de mudar o "servidor", tudo que está em cache pode estar velho.
@@ -46,8 +31,6 @@ export function MockPanel() {
   })
   const disconnectWallets = useMutation({ mutationFn: disconnectMockWallets })
 
-  if (!open) return null
-
   return (
     <aside
       aria-label="Painel de simulação"
@@ -57,7 +40,7 @@ export function MockPanel() {
         <h2 className="font-bold text-text-accent">Simulação</h2>
         <button
           type="button"
-          onClick={() => setOpen(false)}
+          onClick={onClose}
           className="text-text-secondary underline underline-offset-4"
         >
           Fechar

@@ -1,5 +1,11 @@
 import axios from 'axios'
-import { clearSession, getGuestCartId, getSession } from '@/session/session-store'
+import { mocksReady } from '@/lib/mocks-ready'
+import {
+  clearSession,
+  getGuestCartId,
+  getSession,
+  waitForSessionRestore,
+} from '@/session/session-store'
 import { toApiRequestError } from './errors'
 
 export const http = axios.create({
@@ -9,7 +15,12 @@ export const http = axios.create({
   paramsSerializer: { indexes: null },
 })
 
-http.interceptors.request.use((config) => {
+http.interceptors.request.use(async (config) => {
+  await mocksReady
+  // Só depois de saber quem é o usuário o token (ou o carrinho de visitante) é lido.
+  // A própria consulta da sessão não pode esperar por ela mesma.
+  if (config.url !== '/auth/session') await waitForSessionRestore()
+
   const { token } = getSession()
   if (token) {
     config.headers.Authorization = `Bearer ${token}`

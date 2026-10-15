@@ -50,7 +50,12 @@ export function MobileHeroBanner() {
       aria-labelledby="mobile-hero-title"
       className="relative flex h-[190px] flex-col items-center justify-center gap-4 overflow-hidden rounded-xl p-4 md:hidden"
     >
-      <img src="/icons/mobile-hero-mask.svg" alt="" className="absolute inset-0 size-full" />
+      <img
+        src="/icons/mobile-hero-mask.svg"
+        alt=""
+        fetchPriority="high"
+        className="absolute inset-0 size-full"
+      />
       <div className="relative flex w-full items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-col gap-1.5">

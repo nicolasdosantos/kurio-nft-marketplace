@@ -7,10 +7,24 @@ const GUEST_CART_KEY = 'kurio:guest-cart-id'
 interface SessionState {
   token: string | null
   user: User | null
+  // Token salvo que ainda não foi conferido na API (logo depois de abrir o app).
+  restoring: boolean
 }
 
-let session: SessionState = { token: readStorage(TOKEN_KEY), user: null }
+const savedToken = readStorage(TOKEN_KEY)
+let session: SessionState = { token: savedToken, user: null, restoring: savedToken !== null }
 const listeners = new Set<() => void>()
+
+let finishRestore: () => void = () => {}
+const restored = new Promise<void>((resolve) => {
+  finishRestore = resolve
+})
+if (!session.restoring) finishRestore()
+
+// Requisições e rotas privadas esperam aqui para saber quem é o usuário.
+export function waitForSessionRestore() {
+  return restored
+}
 
 function readStorage(key: string) {
   try {
@@ -43,7 +57,8 @@ export function isLoggedIn() {
 
 export function setSession(token: string, user: User) {
   writeStorage(TOKEN_KEY, token)
-  session = { token, user }
+  session = { token, user, restoring: false }
+  finishRestore()
   notify()
 }
 
@@ -54,7 +69,8 @@ export function updateSessionUser(user: User) {
 
 export function clearSession() {
   writeStorage(TOKEN_KEY, null)
-  session = { token: null, user: null }
+  session = { token: null, user: null, restoring: false }
+  finishRestore()
   notify()
 }
 
@@ -84,6 +100,8 @@ export function useSession() {
 }
 
 // Dono dos dados no cache: o usuário logado ou o carrinho do visitante.
+// Enquanto a sessão é conferida, nada privado pode cair na chave do visitante.
 export function cacheOwner(currentSession: SessionState = session) {
+  if (currentSession.restoring) return 'pending'
   return currentSession.user ? `user:${currentSession.user.id}` : `guest:${getGuestCartId()}`
 }

@@ -1,11 +1,14 @@
 import { lazy, Suspense } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { MockPanelToggle } from '@/components/MockPanelToggle'
 import { MobileTabBar } from '@/components/layout/MobileTabBar'
 import { SiteFooter } from '@/components/layout/SiteFooter'
 import { SiteHeader } from '@/components/layout/SiteHeader'
 import { useAnnouncement } from '@/realtime/announcements'
 import { useRealtimeSync } from '@/realtime/useRealtimeSync'
+import { useSocketStatus } from '@/realtime/useSocketStatus'
+import { useMediaQuery } from '@/lib/use-media-query'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -14,10 +17,7 @@ export interface RouterContext {
 // Devtools só em dev, para não entrar no bundle de produção.
 const Devtools = import.meta.env.DEV ? lazy(() => import('@/lib/devtools')) : () => null
 
-const MockPanel =
-  import.meta.env.VITE_ENABLE_MOCKS === 'true'
-    ? lazy(() => import('@/components/MockPanel').then((module) => ({ default: module.MockPanel })))
-    : () => null
+const showMockPanel = import.meta.env.VITE_ENABLE_MOCKS === 'true'
 
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootLayout,
@@ -27,6 +27,10 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootLayout() {
   useRealtimeSync()
   const announcement = useAnnouncement()
+  const socketConnected = useSocketStatus()
+  // Header e tab bar não ficam escondidos por CSS: o que não aparece nem é renderizado,
+  // para não baixar os ícones do outro layout.
+  const isTabletUp = useMediaQuery('(min-width: 768px)')
 
   return (
     <>
@@ -36,19 +40,23 @@ function RootLayout() {
       >
         Pular para o conteúdo
       </a>
-      <SiteHeader />
+      {isTabletUp && <SiteHeader />}
       <div id="conteudo" tabIndex={-1} className="outline-none">
         <Outlet />
       </div>
       <SiteFooter />
-      <MobileTabBar />
+      {!isTabletUp && <MobileTabBar />}
+      <span className="sr-only">
+        Tempo real:{' '}
+        <span data-testid="socket-status">{socketConnected ? 'conectado' : 'desconectado'}</span>
+      </span>
       <p role="status" aria-live="polite" data-testid="realtime-announcement" className="sr-only">
         {announcement}
       </p>
       <Suspense>
         <Devtools />
-        <MockPanel />
       </Suspense>
+      {showMockPanel && <MockPanelToggle />}
     </>
   )
 }

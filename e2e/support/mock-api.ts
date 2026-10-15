@@ -56,9 +56,10 @@ export async function login(page: Page, email: string, extra: { guestCartId?: st
   return result.body.token as string
 }
 
-// O app só renderiza depois do worker do MSW pronto; antes disso o fetch escaparia dos mocks.
+// A interface aparece antes do worker do MSW; o fetch só passa pelos mocks depois
+// que o app marca <html data-mocks="ready">.
 export async function waitForMocks(page: Page) {
-  await page.getByRole('heading', { level: 1 }).waitFor()
+  await page.locator('html[data-mocks="ready"]').waitFor({ state: 'attached' })
 }
 
 export async function startCleanMockServer(page: Page) {

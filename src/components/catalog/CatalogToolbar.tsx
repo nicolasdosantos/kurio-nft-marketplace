@@ -1,12 +1,5 @@
-import type { NftSort, NftTab } from '@/api/contracts/nfts'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import type { CatalogSearch } from '@/lib/catalog-search'
+import type { NftTab } from '@/api/contracts/nfts'
+import { sortOptions, type CatalogSearch } from '@/lib/catalog-search'
 
 const tabs: { id: NftTab; label: string }[] = [
   { id: 'all', label: 'Todos os NFTs' },
@@ -14,20 +7,9 @@ const tabs: { id: NftTab; label: string }[] = [
   { id: 'trending', label: 'Em alta' },
 ]
 
-const sortOptions: { id: NftSort; label: string }[] = [
-  { id: 'recent', label: 'Listados recentemente' },
-  { id: 'price-asc', label: 'Menor preço' },
-  { id: 'price-desc', label: 'Maior preço' },
-  { id: 'name', label: 'Nome (A-Z)' },
-]
-
 interface CatalogToolbarProps {
   search: CatalogSearch
   onFiltersChange: (changes: Partial<CatalogSearch>) => void
-}
-
-interface SortSelectProps extends CatalogToolbarProps {
-  idPrefix: string
 }
 
 export function CatalogTabs({ search, onFiltersChange }: CatalogToolbarProps) {
@@ -63,34 +45,17 @@ export function CatalogTabs({ search, onFiltersChange }: CatalogToolbarProps) {
   )
 }
 
-export function SortSelect({ search, onFiltersChange, idPrefix }: SortSelectProps) {
-  const labelId = `${idPrefix}-sort-label`
+// Enquanto o Select do Radix carrega: mesmo texto e mesmo tamanho, sem pular.
+export function SortSelectPlaceholder({ search }: { search: CatalogSearch }) {
+  const activeSort = sortOptions.find((option) => option.id === (search.sort ?? 'recent'))
 
   return (
-    <div className="flex items-center gap-2 text-body text-foreground">
-      <span id={labelId}>Ordenar por:</span>
-      <Select
-        value={search.sort ?? 'recent'}
-        onValueChange={(value) => {
-          const sort = value as NftSort
-          onFiltersChange({ sort: sort === 'recent' ? undefined : sort })
-        }}
-      >
-        <SelectTrigger
-          aria-labelledby={labelId}
-          className="h-auto gap-2 border-none bg-transparent p-0 text-body text-foreground shadow-none dark:bg-transparent [&>svg]:hidden"
-        >
-          <SelectValue />
-          <img src="/icons/arrow-down.svg" alt="" width={11} height={6} />
-        </SelectTrigger>
-        <SelectContent className="border-border-soft bg-surface-card">
-          {sortOptions.map((option) => (
-            <SelectItem key={option.id} value={option.id}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+    <div aria-hidden="true" className="flex h-8 items-center gap-2 text-body text-foreground">
+      <span>Ordenar por:</span>
+      <span className="flex items-center gap-2">
+        {activeSort?.label}
+        <img src="/icons/arrow-down.svg" alt="" width={11} height={6} />
+      </span>
     </div>
   )
 }

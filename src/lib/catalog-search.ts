@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { ethAmountSchema, networkSchema } from '@/api/contracts/common'
-import { nftSortSchema, nftTabSchema, type NftListParams } from '@/api/contracts/nfts'
+import { nftSortSchema, nftTabSchema, type NftListParams, type NftSort } from '@/api/contracts/nfts'
 
 // Valores inválidos na URL viram "sem filtro" em vez de quebrar a página.
 export const catalogSearchSchema = z.object({
@@ -16,6 +16,13 @@ export const catalogSearchSchema = z.object({
 export type CatalogSearch = z.infer<typeof catalogSearchSchema>
 
 export const CATALOG_PAGE_SIZE = 9
+
+export const sortOptions: { id: NftSort; label: string }[] = [
+  { id: 'recent', label: 'Listados recentemente' },
+  { id: 'price-asc', label: 'Menor preço' },
+  { id: 'price-desc', label: 'Maior preço' },
+  { id: 'name', label: 'Nome (A-Z)' },
+]
 
 export function toNftListParams(search: CatalogSearch): NftListParams {
   return {

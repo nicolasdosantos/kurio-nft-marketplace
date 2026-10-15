@@ -1,22 +1,42 @@
-import { useRef, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useRef, useState, type FormEvent } from 'react'
 import { useNftList } from '@/api/catalog'
-import { CatalogFilters } from '@/components/catalog/CatalogFilters'
 import { CatalogPagination } from '@/components/catalog/CatalogPagination'
-import { CatalogTabs, SortSelect } from '@/components/catalog/CatalogToolbar'
+import { CatalogTabs, SortSelectPlaceholder } from '@/components/catalog/CatalogToolbar'
 import { NftCard, NftCardSkeleton } from '@/components/catalog/NftCard'
 import { BlogSection } from '@/components/home/BlogSection'
 import { FeaturedBanner } from '@/components/home/FeaturedBanner'
 import { HomeHero, MobileHeroBanner } from '@/components/home/HomeHero'
 import { PromoCards } from '@/components/home/PromoCards'
 import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { Skeleton } from '@/components/ui/skeleton'
 import { CATALOG_PAGE_SIZE, toNftListParams, type CatalogSearch } from '@/lib/catalog-search'
+import { useIsDesktop, useMediaQuery } from '@/lib/use-media-query'
+
+// Filtros, ordenação e o Sheet usam os componentes mais pesados do Radix e não
+// fazem parte da primeira tela no mobile: carregam sob demanda.
+const CatalogFilters = lazy(() =>
+  import('@/components/catalog/CatalogFilters').then((module) => ({
+    default: module.CatalogFilters,
+  })),
+)
+const SortSelect = lazy(() =>
+  import('@/components/catalog/SortSelect').then((module) => ({ default: module.SortSelect })),
+)
+const FiltersSheet = lazy(() =>
+  import('@/components/catalog/FiltersSheet').then((module) => ({
+    default: module.FiltersSheet,
+  })),
+)
+
+function FiltersSkeleton() {
+  return (
+    <div className="flex flex-col gap-3" aria-hidden="true">
+      {Array.from({ length: 12 }, (_, index) => (
+        <Skeleton key={index} className="h-6" />
+      ))}
+    </div>
+  )
+}
 
 interface HomePageProps {
   search: CatalogSearch
@@ -63,8 +83,12 @@ function MobileSearchForm({
 export function HomePage({ search, onFiltersChange }: HomePageProps) {
   const listQuery = useNftList(toNftListParams(search))
   const [filtersOpen, setFiltersOpen] = useState(false)
+  // O Sheet só é baixado na primeira vez que alguém abre os filtros.
+  const [filtersRequested, setFiltersRequested] = useState(false)
   const filtersOpener = useRef<HTMLButtonElement | null>(null)
   const facets = listQuery.data?.facets
+  const isTabletUp = useMediaQuery('(min-width: 768px)')
+  const isDesktop = useIsDesktop()
 
   const filtersButton = (
     <button
@@ -72,6 +96,7 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
       aria-label="Abrir filtros"
       onClick={(event) => {
         filtersOpener.current = event.currentTarget
+        setFiltersRequested(true)
         setFiltersOpen(true)
       }}
       className="grid size-[45px] shrink-0 place-items-center rounded-[14px] bg-[linear-gradient(137deg,rgba(210,138,76,0.45)_25%,var(--color-primary)_100%)] lg:hidden"
@@ -91,21 +116,25 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
         {filtersButton}
       </div>
 
-      <MobileHeroBanner />
-      <HomeHero />
+      {/* Só o hero do layout atual vai para a página: o escondido baixaria as imagens à toa. */}
+      {isTabletUp ? <HomeHero /> : <MobileHeroBanner />}
 
       <div id="catalogo" className="flex scroll-mt-6 gap-12">
-        <aside aria-label="Filtros" className="hidden w-[310px] shrink-0 flex-col gap-6 lg:flex">
-          <div className="bg-surface-card p-5">
-            <CatalogFilters
-              idPrefix="sidebar"
-              search={search}
-              facets={facets}
-              onFiltersChange={onFiltersChange}
-            />
-          </div>
-          <FeaturedBanner />
-        </aside>
+        {isDesktop && (
+          <aside aria-label="Filtros" className="flex w-[310px] shrink-0 flex-col gap-6">
+            <div className="bg-surface-card p-5">
+              <Suspense fallback={<FiltersSkeleton />}>
+                <CatalogFilters
+                  idPrefix="sidebar"
+                  search={search}
+                  facets={facets}
+                  onFiltersChange={onFiltersChange}
+                />
+              </Suspense>
+            </div>
+            <FeaturedBanner />
+          </aside>
+        )}
 
         <section
           aria-label="Catálogo de NFTs"
@@ -113,10 +142,18 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
         >
           <div className="flex flex-wrap items-start justify-between gap-4">
             <CatalogTabs search={search} onFiltersChange={onFiltersChange} />
-            <div className="hidden items-center gap-4 md:flex">
-              {filtersButton}
-              <SortSelect idPrefix="toolbar" search={search} onFiltersChange={onFiltersChange} />
-            </div>
+            {isTabletUp && (
+              <div className="flex items-center gap-4">
+                {filtersButton}
+                <Suspense fallback={<SortSelectPlaceholder search={search} />}>
+                  <SortSelect
+                    idPrefix="toolbar"
+                    search={search}
+                    onFiltersChange={onFiltersChange}
+                  />
+                </Suspense>
+              </div>
+            )}
           </div>
 
           <p role="status" className="sr-only" data-testid="catalog-total">
@@ -190,34 +227,18 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
       <PromoCards />
       <BlogSection />
 
-      {/* Um Sheet só, aberto pelo botão do mobile ou do tablet (no desktop a sidebar fica visível). */}
-      <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
-        <SheetContent
-          side="left"
-          className="w-[330px] overflow-y-auto border-border-soft bg-surface-card p-5"
-          onCloseAutoFocus={(event) => {
-            // Sem SheetTrigger o Radix não sabe para onde voltar o foco.
-            event.preventDefault()
-            filtersOpener.current?.focus()
-          }}
-        >
-          <SheetHeader className="p-0">
-            <SheetTitle className="text-heading text-foreground">Filtros</SheetTitle>
-            <SheetDescription className="text-text-secondary">
-              Os resultados atualizam a cada filtro escolhido.
-            </SheetDescription>
-          </SheetHeader>
-          <div className="md:hidden">
-            <SortSelect idPrefix="sheet" search={search} onFiltersChange={onFiltersChange} />
-          </div>
-          <CatalogFilters
-            idPrefix="sheet"
+      {filtersRequested && (
+        <Suspense>
+          <FiltersSheet
+            open={filtersOpen}
+            onOpenChange={setFiltersOpen}
+            opener={filtersOpener}
             search={search}
             facets={facets}
             onFiltersChange={onFiltersChange}
           />
-        </SheetContent>
-      </Sheet>
+        </Suspense>
+      )}
     </main>
   )
 }

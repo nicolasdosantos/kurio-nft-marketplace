@@ -47,6 +47,7 @@ export function PromoCards() {
               Explorar
               <img
                 src="/icons/arrow-right.svg"
+                loading="lazy"
                 alt=""
                 width={11}
                 height={13}
@@ -56,6 +57,7 @@ export function PromoCards() {
           </div>
           <img
             src="/icons/promo-mask.svg"
+            loading="lazy"
             alt=""
             className="pointer-events-none absolute inset-0 size-full"
           />
