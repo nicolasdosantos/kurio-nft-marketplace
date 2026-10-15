@@ -1,7 +1,38 @@
-import { expect, type Page } from '@playwright/test'
+import { expect, type Page, type Request } from '@playwright/test'
 
 export function isDesktopLayout(page: Page) {
   return (page.viewportSize()?.width ?? 0) >= 768
+}
+
+// O networkidle não segura as requisições respondidas pelo service worker do MSW: ele
+// liberava o teste com buscas do novo usuário ainda em andamento. Aqui contamos as
+// chamadas /api/ desde antes da ação e esperamos a contagem zerar e ficar parada.
+function trackApiRequests(page: Page) {
+  // Só as que começaram depois daqui: as anteriores não entram na conta.
+  const inFlight = new Set<Request>()
+  let lastChange = Date.now()
+  const onStart = (request: Request) => {
+    if (!new URL(request.url()).pathname.startsWith('/api/')) return
+    inFlight.add(request)
+    lastChange = Date.now()
+  }
+  const onEnd = (request: Request) => {
+    if (!inFlight.delete(request)) return
+    lastChange = Date.now()
+  }
+  page.on('request', onStart)
+  page.on('requestfinished', onEnd)
+  page.on('requestfailed', onEnd)
+
+  return async function waitForApiIdle() {
+    // 300ms parado cobre as requisições que ainda estão no interceptor do Axios.
+    await expect
+      .poll(() => inFlight.size === 0 && Date.now() - lastChange >= 300, { timeout: 10_000 })
+      .toBe(true)
+    page.off('request', onStart)
+    page.off('requestfinished', onEnd)
+    page.off('requestfailed', onEnd)
+  }
 }
 
 export async function loginThroughUi(page: Page, email: string) {
@@ -10,10 +41,11 @@ export async function loginThroughUi(page: Page, email: string) {
   }
   await page.getByLabel('E-mail', { exact: true }).fill(email)
   await page.getByLabel('Senha', { exact: true }).fill('kurio123')
+  const waitForApiIdle = trackApiRequests(page)
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
   await page.waitForURL((url) => !url.pathname.startsWith('/login'))
   // Espera as buscas do novo usuário terminarem antes de o teste seguir.
-  await page.waitForLoadState('networkidle')
+  await waitForApiIdle()
 }
 
 // Desktop: menu do usuário no header. Mobile: ícone de conta na tab bar.
@@ -28,6 +60,7 @@ export async function openProfile(page: Page) {
 }
 
 export async function logoutThroughUi(page: Page) {
+  const waitForApiIdle = trackApiRequests(page)
   if (isDesktopLayout(page)) {
     await page.getByTestId('current-user').click()
     await page.getByRole('menuitem', { name: 'Sair' }).click()
@@ -36,7 +69,7 @@ export async function logoutThroughUi(page: Page) {
     await page.getByRole('button', { name: 'Sair' }).click()
   }
   await page.waitForURL((url) => url.pathname === '/')
-  await page.waitForLoadState('networkidle')
+  await waitForApiIdle()
 }
 
 // No mobile o badge some quando o carrinho está vazio.
