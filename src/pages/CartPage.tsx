@@ -250,7 +250,10 @@ export function CartPage() {
         </div>
         {/* Altura de um carrinho com 3 itens: skeleton, vazio e carrinho pequeno ocupam o
             mesmo espaço e o carrossel de baixo não pula (CLS). */}
-        <div data-testid="cart-content" className="min-h-[692px] md:min-h-[712px] lg:min-h-[365px]">
+        <div
+          data-testid="cart-content"
+          className="flex min-h-[716px] flex-col gap-3 md:min-h-[712px] lg:min-h-[365px]"
+        >
           {content}
         </div>
         <div className="mt-24 px-6">
@@ -272,7 +275,10 @@ export function CartPage() {
         </nav>
         {/* Altura de um carrinho com 3 itens: skeleton, vazio e carrinho pequeno ocupam o
             mesmo espaço e o carrossel de baixo não pula (CLS). */}
-        <div data-testid="cart-content" className="min-h-[692px] md:min-h-[712px] lg:min-h-[365px]">
+        <div
+          data-testid="cart-content"
+          className="flex min-h-[716px] flex-col gap-3 md:min-h-[712px] lg:min-h-[365px]"
+        >
           {content}
         </div>
       </div>
