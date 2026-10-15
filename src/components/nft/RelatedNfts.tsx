@@ -70,7 +70,7 @@ export function RelatedNfts({ nft }: { nft: Nft }) {
       </ul>
 
       {totalPages > 1 && (
-        <div role="group" aria-label="Páginas do carrossel" className="flex justify-center gap-2">
+        <div role="group" aria-label="Páginas do carrossel" className="flex justify-center">
           {Array.from({ length: totalPages }, (_, index) => (
             <button
               key={index}
@@ -78,11 +78,16 @@ export function RelatedNfts({ nft }: { nft: Nft }) {
               aria-label={`Página ${index + 1} de ${totalPages}`}
               aria-current={index === currentPage ? 'true' : undefined}
               onClick={() => setPage(index)}
-              className={cn(
-                'relative size-3 rounded-full border-[1.3px] border-primary after:absolute after:-inset-2',
-                index === currentPage && 'bg-primary',
-              )}
-            />
+              // Alvo de toque de 24px; o ponto de 12px do Figma fica dentro.
+              className="grid size-6 place-items-center"
+            >
+              <span
+                className={cn(
+                  'size-3 rounded-full border-[1.3px] border-primary',
+                  index === currentPage && 'bg-primary',
+                )}
+              />
+            </button>
           ))}
         </div>
       )}

@@ -140,7 +140,8 @@ export function MobileNftHero({
             className={cn('size-full object-cover', view.crop)}
           />
         </div>
-        <div className="absolute bottom-[50px] left-1/2 flex -translate-x-1/2 items-center gap-[7px]">
+        {/* Botões de 24px (alvo de toque mínimo); o ponto do Figma fica dentro deles. */}
+        <div className="absolute bottom-[42px] left-1/2 flex -translate-x-1/2 items-center">
           {galleryViews.map((item, index) => (
             <button
               key={item.label}
@@ -148,12 +149,15 @@ export function MobileNftHero({
               aria-label={`Mostrar ${item.label}`}
               aria-pressed={index === viewIndex}
               onClick={() => onViewChange(index)}
-              // A área de toque é maior que o ponto de 7px.
-              className={cn(
-                'relative h-[7px] rounded-full bg-primary after:absolute after:-inset-3',
-                index === viewIndex ? 'w-7' : 'w-[7px]',
-              )}
-            />
+              className="grid h-6 min-w-6 place-items-center px-1"
+            >
+              <span
+                className={cn(
+                  'h-[7px] rounded-full bg-primary',
+                  index === viewIndex ? 'w-7' : 'w-[7px]',
+                )}
+              />
+            </button>
           ))}
         </div>
       </div>
