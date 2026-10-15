@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
-import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
+import { createRootRouteWithContext, Link, Outlet, useRouterState } from '@tanstack/react-router'
 import { MockPanelToggle } from '@/components/MockPanelToggle'
 import { MobileTabBar } from '@/components/layout/MobileTabBar'
 import { SiteFooter } from '@/components/layout/SiteFooter'
@@ -31,6 +31,10 @@ function RootLayout() {
   // Header e tab bar não ficam escondidos por CSS: o que não aparece nem é renderizado,
   // para não baixar os ícones do outro layout.
   const isTabletUp = useMediaQuery('(min-width: 768px)')
+  // No detalhe do NFT, a barra de compra do Figma mobile ocupa o lugar da tab bar.
+  const isNftDetail = useRouterState({
+    select: (state) => state.location.pathname.startsWith('/nft/'),
+  })
 
   return (
     <>
@@ -45,7 +49,7 @@ function RootLayout() {
         <Outlet />
       </div>
       <SiteFooter />
-      {!isTabletUp && <MobileTabBar />}
+      {!isTabletUp && !isNftDetail && <MobileTabBar />}
       <span className="sr-only">
         Tempo real:{' '}
         <span data-testid="socket-status">{socketConnected ? 'conectado' : 'desconectado'}</span>

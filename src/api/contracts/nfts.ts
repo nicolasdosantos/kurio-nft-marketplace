@@ -47,6 +47,8 @@ export const reviewSchema = z.object({
 
 export const nftSchema = nftSummarySchema.extend({
   description: z.string(),
+  // O que a arte mostra, para o texto alternativo da galeria.
+  imageDescription: z.string(),
   attributes: z.array(z.string()),
   contractAddress: z.string(),
   royaltyPercent: z.number(),

@@ -54,6 +54,10 @@ export async function openProfile(page: Page) {
     await page.getByTestId('current-user').click()
     await page.getByRole('menuitem', { name: 'Dados do perfil' }).click()
   } else {
+    // No detalhe do NFT a tab bar dá lugar à barra de compra: volta antes, como o usuário faria.
+    if (new URL(page.url()).pathname.startsWith('/nft/')) {
+      await page.getByRole('button', { name: 'Voltar' }).click()
+    }
     await page.getByRole('link', { name: 'Minha conta' }).click()
   }
   await expect(page.getByTestId('profile-email')).toBeVisible()

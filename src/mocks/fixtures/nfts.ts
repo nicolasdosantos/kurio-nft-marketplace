@@ -24,6 +24,13 @@ const artworkAttributes: Record<Artwork, string[]> = {
   golden: ['Fones', 'Jaqueta'],
 }
 
+const artworkDescriptions: Record<Artwork, string> = {
+  emerald: 'macaco de óculos redondos e jaqueta verde',
+  nomad: 'gorila de chapéu verde e moletom roxo',
+  baron: 'macaco de cabelo penteado, gola alta verde e blazer claro',
+  golden: 'macaco dourado com fones de ouvido verdes e jaqueta clara',
+}
+
 // A raridade é de cada NFT, não da arte. O Neon Vessel #552 é o card com o selo RARO no Figma mobile.
 const rareNfts = new Set([
   'Neon Vessel #552',
@@ -161,6 +168,7 @@ function buildNft(row: NftRow, index: number): Nft {
     listedAt: new Date(LISTING_BASE_DATE - listedDaysAgo * DAY_MS).toISOString(),
     version: 1,
     description: `${name} é uma obra digital da coleção ${collection.name}, verificada na ${networkLabel[network]}. Cada atributo fica registrado nos metadados do token, com procedência permanente na rede e arte desbloqueável para colecionadores.`,
+    imageDescription: artworkDescriptions[artwork],
     attributes: [...artworkAttributes[artwork], rarityLabels[rarity]],
     contractAddress: contractByNetwork[network],
     royaltyPercent: 5,

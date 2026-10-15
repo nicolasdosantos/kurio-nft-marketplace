@@ -65,8 +65,9 @@ export interface MockDb {
   wallets: Record<string, WalletState>
 }
 
-// v2: os NFTs ganharam o campo rarity; um banco salvo no formato antigo é descartado.
-const STORAGE_KEY = 'kurio:mock-db:v2'
+// Sobe a versão quando o formato dos dados muda (v2: rarity, v3: imageDescription);
+// um banco salvo no formato antigo é descartado.
+const STORAGE_KEY = 'kurio:mock-db:v3'
 
 let db: MockDb
 
