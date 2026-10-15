@@ -9,7 +9,11 @@ test('regressão visual do Início', async ({ page }) => {
   await startCleanMockServer(page)
   await page.reload()
   await expect(page.getByTestId('catalog-results').getByRole('listitem')).toHaveCount(9)
-  await page.waitForLoadState('networkidle')
+  // As imagens abaixo da dobra são lazy; na captura de página inteira todas precisam estar lá.
+  await page.evaluate(async () => {
+    for (const image of document.images) image.loading = 'eager'
+    await Promise.all([...document.images].map((image) => image.decode().catch(() => undefined)))
+  })
   await page.evaluate(() => document.fonts.ready)
 
   await expect(page).toHaveScreenshot('inicio.png', {
