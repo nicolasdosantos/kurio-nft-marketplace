@@ -31,11 +31,13 @@ function RootLayout() {
   // Header e tab bar não ficam escondidos por CSS: o que não aparece nem é renderizado,
   // para não baixar os ícones do outro layout.
   const isTabletUp = useMediaQuery('(min-width: 768px)')
-  // No detalhe do NFT e no carrinho, o Figma mobile não tem tab bar: a barra de compra
-  // e o resumo do pedido ficam no lugar dela, e as duas telas têm botão de voltar.
+  // Telas cujo Figma mobile não tem tab bar: no detalhe e no carrinho a barra de compra
+  // e o resumo ficam no lugar dela; login e cadastro são páginas inteiras.
   const hideTabBar = useRouterState({
-    select: (state) =>
-      state.location.pathname.startsWith('/nft/') || state.location.pathname === '/carrinho',
+    select: (state) => {
+      const { pathname } = state.location
+      return pathname.startsWith('/nft/') || ['/carrinho', '/login', '/cadastro'].includes(pathname)
+    },
   })
 
   return (

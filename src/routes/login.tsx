@@ -1,13 +1,15 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useLogin } from '@/api/auth'
 import { loginRequestSchema } from '@/api/contracts/auth'
-import { safeRedirectPath } from '@/lib/auth-guard'
-import { AuthScreen } from '@/components/AuthScreen'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { ApiRequestError } from '@/api/errors'
+import { AuthField } from '@/components/auth/AuthField'
+import { AuthLayout } from '@/components/auth/AuthLayout'
+import { ComingSoon } from '@/components/layout/ComingSoon'
+import { focusHeaderLogin, safeRedirectPath } from '@/lib/auth-guard'
+import { cn } from '@/lib/utils'
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional().catch(undefined),
@@ -29,72 +31,88 @@ function LoginRoute() {
   const login = useLogin()
   const form = useForm<LoginForm>({ resolver: zodResolver(loginFormSchema) })
   const { errors } = form.formState
-  const nextPath = safeRedirectPath(redirect)
 
   function onSubmit(credentials: LoginForm) {
-    login.mutate(credentials, { onSuccess: () => router.history.push(nextPath) })
+    login.mutate(credentials, {
+      onSuccess: () => router.history.push(safeRedirectPath(redirect)),
+      onError: (error) => {
+        // Credenciais erradas aparecem no campo da senha, que é onde o usuário vai corrigir.
+        if (error instanceof ApiRequestError && error.code === 'INVALID_CREDENTIALS') {
+          form.setError('password', { message: error.message })
+        }
+      },
+    })
   }
 
+  const generalError =
+    login.isError &&
+    !(login.error instanceof ApiRequestError && login.error.code === 'INVALID_CREDENTIALS')
+      ? login.error.message
+      : ''
+
   return (
-    <AuthScreen
-      title="Entrar"
-      description="Entre com seu e-mail e senha para continuar."
-      onClose={() => navigate({ to: '/' })}
+    <AuthLayout
+      mode="login"
+      description="Entre para gerenciar sua carteira, coleção e perfil de criador."
+      mobileTitle="Entrar"
+      redirect={redirect}
+      initialFocusId="login-email"
+      onClose={() => navigate({ to: '/' }).then(focusHeaderLogin)}
     >
-      {expired && (
-        <p role="alert" className="mb-3 text-text-accent">
-          Sua sessão expirou. Entre de novo para continuar de onde parou.
-        </p>
+      {(variant) => (
+        <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
+          {expired && (
+            <p role="alert" className="mb-3 text-body-sm text-text-accent">
+              Sua sessão expirou. Entre de novo para continuar de onde parou.
+            </p>
+          )}
+          <div className="flex flex-col gap-3">
+            <AuthField
+              id="login-email"
+              label="E-mail"
+              variant={variant}
+              type="email"
+              autoComplete="email"
+              placeholder="Digite seu e-mail"
+              error={errors.email?.message}
+              {...form.register('email')}
+            />
+            <AuthField
+              id="login-password"
+              label="Senha"
+              variant={variant}
+              type="password"
+              autoComplete="current-password"
+              placeholder="Senha"
+              error={errors.password?.message}
+              {...form.register('password')}
+            />
+          </div>
+          {/* Recuperação de senha fica fora do escopo. */}
+          <ComingSoon className="mt-3.5 self-end text-body-sm leading-4 text-text-accent">
+            Esqueceu a senha?
+          </ComingSoon>
+
+          {generalError && (
+            <p role="alert" className="mt-3 text-body-sm text-destructive">
+              {generalError}
+            </p>
+          )}
+
+          <button
+            type="submit"
+            disabled={login.isPending}
+            className={cn(
+              'bg-primary font-bold text-ink hover:bg-text-accent disabled:opacity-60',
+              variant === 'desktop'
+                ? 'mt-6 h-[45px] rounded-[4px] text-body'
+                : 'mt-10 h-[60px] rounded-[10px] text-body',
+            )}
+          >
+            {login.isPending ? 'Entrando...' : 'Entrar'}
+          </button>
+        </form>
       )}
-      <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        <label htmlFor="login-email">E-mail</label>
-        <Input
-          id="login-email"
-          type="email"
-          autoComplete="email"
-          {...form.register('email')}
-          aria-invalid={errors.email ? true : undefined}
-          aria-describedby={errors.email ? 'login-email-error' : undefined}
-          className="h-12 bg-ink"
-        />
-        {errors.email && (
-          <span id="login-email-error" className="text-destructive">
-            {errors.email.message}
-          </span>
-        )}
-
-        <label htmlFor="login-password">Senha</label>
-        <Input
-          id="login-password"
-          type="password"
-          autoComplete="current-password"
-          {...form.register('password')}
-          aria-invalid={errors.password ? true : undefined}
-          aria-describedby={errors.password ? 'login-password-error' : undefined}
-          className="h-12 bg-ink"
-        />
-        {errors.password && (
-          <span id="login-password-error" className="text-destructive">
-            {errors.password.message}
-          </span>
-        )}
-
-        {login.isError && (
-          <p role="alert" className="text-destructive">
-            {login.error.message}
-          </p>
-        )}
-
-        <Button type="submit" disabled={login.isPending} className="mt-4 h-[60px] text-body-lg">
-          {login.isPending ? 'Entrando...' : 'Entrar'}
-        </Button>
-      </form>
-      <p className="mt-4 text-center">
-        Não tem conta?{' '}
-        <Link to="/cadastro" search={{ redirect }} className="underline">
-          Criar perfil
-        </Link>
-      </p>
-    </AuthScreen>
+    </AuthLayout>
   )
 }

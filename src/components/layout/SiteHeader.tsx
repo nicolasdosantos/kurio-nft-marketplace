@@ -109,6 +109,7 @@ export function SiteHeader() {
             </Suspense>
           ) : (
             <Link
+              id="header-login"
               to="/login"
               className="flex h-[35px] w-[100px] items-center justify-center gap-1 rounded-[6px] bg-primary text-body-md font-medium text-ink hover:bg-text-accent"
             >

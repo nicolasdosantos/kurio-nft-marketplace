@@ -1,27 +1,59 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { createFileRoute, Link, useRouter } from '@tanstack/react-router'
+import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { z } from 'zod'
 import { useRegister } from '@/api/auth'
 import { registerRequestSchema } from '@/api/contracts/auth'
 import { ApiRequestError } from '@/api/errors'
-import { safeRedirectPath } from '@/lib/auth-guard'
-import { AuthScreen } from '@/components/AuthScreen'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { AuthField } from '@/components/auth/AuthField'
+import { AuthLayout } from '@/components/auth/AuthLayout'
+import { focusHeaderLogin, safeRedirectPath } from '@/lib/auth-guard'
+import { cn } from '@/lib/utils'
 
 const registerSearchSchema = z.object({
   redirect: z.string().optional().catch(undefined),
 })
 
-const registerFormSchema = registerRequestSchema.omit({ guestCartId: true })
+// O Figma não tem o campo de nome de exibição: ele começa igual ao nome de usuário
+// e pode ser trocado depois no perfil.
+const registerFormSchema = registerRequestSchema
+  .omit({ displayName: true, guestCartId: true })
+  .extend({ confirmPassword: z.string().min(1, 'Confirme a senha.') })
+  .refine((account) => account.password === account.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'As senhas não são iguais.',
+  })
 type RegisterForm = z.infer<typeof registerFormSchema>
 
 const fields = [
-  { name: 'displayName', label: 'Nome de exibição', type: 'text', autoComplete: 'name' },
-  { name: 'username', label: 'Nome de usuário', type: 'text', autoComplete: 'username' },
-  { name: 'email', label: 'E-mail', type: 'email', autoComplete: 'email' },
-  { name: 'password', label: 'Senha', type: 'password', autoComplete: 'new-password' },
+  {
+    name: 'username',
+    label: 'Nome de usuário',
+    placeholder: 'Nome de usuário',
+    type: 'text',
+    autoComplete: 'username',
+  },
+  {
+    name: 'email',
+    label: 'E-mail',
+    placeholder: 'Digite seu e-mail',
+    type: 'email',
+    autoComplete: 'email',
+  },
+  {
+    name: 'password',
+    label: 'Senha',
+    placeholder: 'Senha',
+    type: 'password',
+    autoComplete: 'new-password',
+  },
+  {
+    name: 'confirmPassword',
+    label: 'Confirmar senha',
+    placeholder: 'Confirmar senha',
+    type: 'password',
+    autoComplete: 'new-password',
+  },
 ] as const
 
 export const Route = createFileRoute('/cadastro')({
@@ -37,64 +69,77 @@ function RegisterRoute() {
   const form = useForm<RegisterForm>({ resolver: zodResolver(registerFormSchema) })
   const { errors } = form.formState
 
-  function onSubmit(account: RegisterForm) {
-    register.mutate(account, {
-      onSuccess: () => router.history.push(safeRedirectPath(redirect)),
-      onError: (error) => {
-        if (!(error instanceof ApiRequestError)) return
-        for (const [field, message] of Object.entries(error.fields)) {
-          form.setError(field as keyof RegisterForm, { message })
-        }
+  function onSubmit({ username, email, password }: RegisterForm) {
+    register.mutate(
+      { displayName: username, username, email, password },
+      {
+        onSuccess: () => router.history.push(safeRedirectPath(redirect)),
+        onError: (error) => {
+          // E-mail ou usuário em uso (409) e campos inválidos (422) voltam no campo certo.
+          if (!(error instanceof ApiRequestError)) return
+          for (const [field, message] of Object.entries(error.fields)) {
+            if (field === 'displayName') continue
+            form.setError(field as keyof RegisterForm, { message })
+          }
+        },
       },
-    })
+    )
   }
 
   const hasFieldErrors =
     register.error instanceof ApiRequestError && Object.keys(register.error.fields).length > 0
 
   return (
-    <AuthScreen
-      title="Criar perfil"
-      description="Crie sua conta de colecionador para comprar e favoritar NFTs."
-      onClose={() => navigate({ to: '/' })}
+    <AuthLayout
+      mode="register"
+      description="Crie seu perfil de colecionador e conecte uma carteira quando quiser."
+      mobileTitle="Criar perfil de colecionador"
+      redirect={redirect}
+      initialFocusId="register-username"
+      onClose={() => navigate({ to: '/' }).then(focusHeaderLogin)}
     >
-      <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
-        {fields.map((field) => (
-          <div key={field.name} className="flex flex-col">
-            <label htmlFor={`register-${field.name}`}>{field.label}</label>
-            <Input
-              id={`register-${field.name}`}
-              type={field.type}
-              autoComplete={field.autoComplete}
-              {...form.register(field.name)}
-              aria-invalid={errors[field.name] ? true : undefined}
-              aria-describedby={errors[field.name] ? `register-${field.name}-error` : undefined}
-              className="h-12 bg-ink"
-            />
-            {errors[field.name] && (
-              <span id={`register-${field.name}-error`} className="text-destructive">
-                {errors[field.name]?.message}
-              </span>
-            )}
+      {(variant) => (
+        <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col">
+          <div className="flex flex-col gap-3">
+            {fields.map((field) => (
+              <AuthField
+                key={field.name}
+                id={`register-${field.name}`}
+                label={field.label}
+                variant={variant}
+                type={field.type}
+                autoComplete={field.autoComplete}
+                placeholder={field.placeholder}
+                error={errors[field.name]?.message}
+                {...form.register(field.name)}
+              />
+            ))}
           </div>
-        ))}
 
-        {register.isError && !hasFieldErrors && (
-          <p role="alert" className="text-destructive">
-            {register.error.message}
-          </p>
-        )}
+          {register.isError && !hasFieldErrors && (
+            <p role="alert" className="mt-3 text-body-sm text-destructive">
+              {register.error.message}
+            </p>
+          )}
 
-        <Button type="submit" disabled={register.isPending} className="mt-4 h-[60px] text-body-lg">
-          {register.isPending ? 'Criando...' : 'Criar perfil'}
-        </Button>
-      </form>
-      <p className="mt-4 text-center">
-        Já tem conta?{' '}
-        <Link to="/login" search={{ redirect }} className="underline">
-          Entrar
-        </Link>
-      </p>
-    </AuthScreen>
+          <button
+            type="submit"
+            disabled={register.isPending}
+            className={cn(
+              'bg-primary font-bold text-ink hover:bg-text-accent disabled:opacity-60',
+              variant === 'desktop'
+                ? 'mt-6 h-[45px] rounded-[4px] text-body'
+                : 'mt-10 h-[60px] rounded-[10px] text-body',
+            )}
+          >
+            {register.isPending
+              ? 'Criando...'
+              : variant === 'desktop'
+                ? 'Criar conta'
+                : 'Criar perfil'}
+          </button>
+        </form>
+      )}
+    </AuthLayout>
   )
 }
