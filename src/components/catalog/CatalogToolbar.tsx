@@ -37,7 +37,8 @@ export function CatalogTabs({ search, onFiltersChange }: CatalogToolbarProps) {
     <div
       role="group"
       aria-label="Abas do catálogo"
-      className="flex flex-wrap gap-x-3 gap-y-2 text-body-sm md:gap-x-5 md:text-body"
+      // Sem quebra de linha: com a fonte reserva (mais larga) as abas quebrariam e a grade pularia.
+      className="-mx-6 flex gap-x-3 overflow-x-auto px-6 text-body-sm md:mx-0 md:gap-x-5 md:overflow-visible md:px-0 md:text-body"
     >
       {tabs.map((tab) => {
         const active = tab.id === activeTab
