@@ -29,7 +29,7 @@ export default defineConfig([
     },
   },
   {
-    // shadcn/ui components and route files export non-components by design.
+    // Componentes do shadcn e arquivos de rota exportam outras coisas além do componente.
     files: ['src/components/ui/**/*.tsx', 'src/routes/**/*.tsx'],
     rules: { 'react-refresh/only-export-components': 'off' },
   },

@@ -28,7 +28,7 @@ export default defineConfig({
       use: { ...devices['Pixel 7'], viewport: { width: 390, height: 844 } },
     },
   ],
-  // Tests run against the optimized build with mocks enabled.
+  // Roda contra o build de produção, com os mocks ligados.
   webServer: externalBaseUrl
     ? undefined
     : {

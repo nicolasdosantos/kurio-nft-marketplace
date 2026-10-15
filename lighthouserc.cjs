@@ -1,5 +1,3 @@
-// Lighthouse CI config. Pages and profiles are finalized in the performance phase;
-// requirement: 3 runs per page/profile, median reported, HTML/JSON kept.
 module.exports = {
   ci: {
     collect: {
