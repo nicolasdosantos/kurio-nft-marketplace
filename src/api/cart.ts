@@ -20,6 +20,11 @@ export function useCart() {
   })
 }
 
+export function useCartCount() {
+  const cartQuery = useCart()
+  return cartQuery.data?.items.reduce((total, cartItem) => total + cartItem.quantity, 0) ?? 0
+}
+
 export function useQuote(network: Network, enabled = true) {
   const owner = useCartOwner()
   return useQuery({

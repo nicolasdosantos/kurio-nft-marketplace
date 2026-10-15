@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { catalogSearchSchema, type CatalogSearch } from '@/lib/catalog-search'
-import { CatalogPage } from '@/pages/CatalogPage'
+import { HomePage } from '@/pages/HomePage'
 
 export const Route = createFileRoute('/')({
   validateSearch: (search) => catalogSearchSchema.parse(search),
@@ -15,15 +15,5 @@ function CatalogRoute() {
     navigate({ search: (previous) => ({ ...previous, ...changes, page: undefined }) })
   }
 
-  function handlePageChange(page: number) {
-    navigate({ search: (previous) => ({ ...previous, page: page > 1 ? page : undefined }) })
-  }
-
-  return (
-    <CatalogPage
-      search={search}
-      onFiltersChange={handleFiltersChange}
-      onPageChange={handlePageChange}
-    />
-  )
+  return <HomePage search={search} onFiltersChange={handleFiltersChange} />
 }

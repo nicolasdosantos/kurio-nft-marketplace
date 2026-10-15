@@ -1,6 +1,6 @@
 import { useForm, type FieldValues, type Path, type UseFormReturn } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { z } from 'zod'
 import {
   useChangePassword,
@@ -14,6 +14,7 @@ import {
   updateProfileRequestSchema,
   type UpdateProfileRequest,
 } from '@/api/contracts/account'
+import { useLogout } from '@/api/auth'
 import { ApiRequestError } from '@/api/errors'
 import { useFavorites } from '@/api/favorites'
 import { useOrders } from '@/api/orders'
@@ -51,6 +52,8 @@ export function ProfilePage() {
   const updateAvatar = useUpdateAvatar()
   const removeAvatar = useRemoveAvatar()
   const changePassword = useChangePassword()
+  const logout = useLogout()
+  const navigate = useNavigate()
 
   const profileForm = useForm<UpdateProfileRequest>({
     resolver: zodResolver(updateProfileRequestSchema),
@@ -78,7 +81,16 @@ export function ProfilePage() {
 
   return (
     <main className="mx-auto flex max-w-2xl flex-col gap-6 p-4">
-      <h1 className="text-heading font-bold">Perfil do colecionador</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-heading font-bold">Perfil do colecionador</h1>
+        <button
+          type="button"
+          onClick={() => logout.mutate(undefined, { onSettled: () => navigate({ to: '/' }) })}
+          className="font-bold text-text-accent underline-offset-4 hover:underline"
+        >
+          Sair
+        </button>
+      </div>
       <p data-testid="profile-email">{profile.email}</p>
 
       <form

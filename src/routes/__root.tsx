@@ -1,7 +1,9 @@
 import { lazy, Suspense } from 'react'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRootRouteWithContext, Link, Outlet } from '@tanstack/react-router'
-import { AppHeader } from '@/components/AppHeader'
+import { MobileTabBar } from '@/components/layout/MobileTabBar'
+import { SiteFooter } from '@/components/layout/SiteFooter'
+import { SiteHeader } from '@/components/layout/SiteHeader'
 import { useAnnouncement } from '@/realtime/announcements'
 import { useRealtimeSync } from '@/realtime/useRealtimeSync'
 
@@ -28,8 +30,18 @@ function RootLayout() {
 
   return (
     <>
-      <AppHeader />
-      <Outlet />
+      <a
+        href="#conteudo"
+        className="sr-only z-50 rounded bg-primary px-3 py-2 font-bold text-ink focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+      >
+        Pular para o conteúdo
+      </a>
+      <SiteHeader />
+      <div id="conteudo" tabIndex={-1} className="outline-none">
+        <Outlet />
+      </div>
+      <SiteFooter />
+      <MobileTabBar />
       <p role="status" aria-live="polite" data-testid="realtime-announcement" className="sr-only">
         {announcement}
       </p>

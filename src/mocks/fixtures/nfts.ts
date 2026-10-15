@@ -88,6 +88,7 @@ const rows: NftRow[] = [
 
 const LISTING_BASE_DATE = Date.UTC(2026, 9, 1, 12)
 const DAY_MS = 24 * 60 * 60 * 1000
+const FIGMA_CARD_COUNT = 9
 
 function slugify(name: string) {
   return name.toLowerCase().replace('#', '').replace(/\s+/g, '-')
@@ -116,6 +117,8 @@ function buildNft(row: NftRow, index: number): Nft {
   ] = row
   const collection = collections.find((item) => item.slug === collectionSlug)!
   const tokenNumber = name.split('#')[1] ?? String(index)
+  // Os 9 primeiros são os cards do Figma: ficam como os mais recentes, na mesma ordem do layout.
+  const listedDaysAgo = index < FIGMA_CARD_COUNT ? index + 1 : daysAgo + FIGMA_CARD_COUNT
 
   return {
     id: slugify(name),
@@ -126,9 +129,9 @@ function buildNft(row: NftRow, index: number): Nft {
     imageUrl: `/nfts/${artwork}-800.webp`,
     priceEth,
     originalPriceEth,
-    isNew: daysAgo <= 7,
+    isNew: listedDaysAgo <= 7,
     trendingScore,
-    listedAt: new Date(LISTING_BASE_DATE - daysAgo * DAY_MS).toISOString(),
+    listedAt: new Date(LISTING_BASE_DATE - listedDaysAgo * DAY_MS).toISOString(),
     version: 1,
     description: `${name} é uma obra digital da coleção ${collection.name}, verificada na ${networkLabel[network]}. Cada atributo fica registrado nos metadados do token, com procedência permanente na rede e arte desbloqueável para colecionadores.`,
     attributes: artworkAttributes[artwork],

@@ -6,6 +6,8 @@ import { useLogin } from '@/api/auth'
 import { loginRequestSchema } from '@/api/contracts/auth'
 import { safeRedirectPath } from '@/lib/auth-guard'
 import { AuthScreen } from '@/components/AuthScreen'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const loginSearchSchema = z.object({
   redirect: z.string().optional().catch(undefined),
@@ -34,7 +36,11 @@ function LoginRoute() {
   }
 
   return (
-    <AuthScreen title="Entrar" onClose={() => navigate({ to: '/' })}>
+    <AuthScreen
+      title="Entrar"
+      description="Entre com seu e-mail e senha para continuar."
+      onClose={() => navigate({ to: '/' })}
+    >
       {expired && (
         <p role="alert" className="mb-3 text-text-accent">
           Sua sessão expirou. Entre de novo para continuar de onde parou.
@@ -42,14 +48,14 @@ function LoginRoute() {
       )}
       <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
         <label htmlFor="login-email">E-mail</label>
-        <input
+        <Input
           id="login-email"
           type="email"
           autoComplete="email"
           {...form.register('email')}
           aria-invalid={errors.email ? true : undefined}
           aria-describedby={errors.email ? 'login-email-error' : undefined}
-          className="rounded border border-input bg-ink p-2"
+          className="h-12 bg-ink"
         />
         {errors.email && (
           <span id="login-email-error" className="text-destructive">
@@ -58,14 +64,14 @@ function LoginRoute() {
         )}
 
         <label htmlFor="login-password">Senha</label>
-        <input
+        <Input
           id="login-password"
           type="password"
           autoComplete="current-password"
           {...form.register('password')}
           aria-invalid={errors.password ? true : undefined}
           aria-describedby={errors.password ? 'login-password-error' : undefined}
-          className="rounded border border-input bg-ink p-2"
+          className="h-12 bg-ink"
         />
         {errors.password && (
           <span id="login-password-error" className="text-destructive">
@@ -79,13 +85,9 @@ function LoginRoute() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={login.isPending}
-          className="mt-2 rounded bg-primary p-2 font-bold text-primary-foreground"
-        >
+        <Button type="submit" disabled={login.isPending} className="mt-4 h-[60px] text-body-lg">
           {login.isPending ? 'Entrando...' : 'Entrar'}
-        </button>
+        </Button>
       </form>
       <p className="mt-4 text-center">
         Não tem conta?{' '}

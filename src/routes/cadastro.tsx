@@ -7,6 +7,8 @@ import { registerRequestSchema } from '@/api/contracts/auth'
 import { ApiRequestError } from '@/api/errors'
 import { safeRedirectPath } from '@/lib/auth-guard'
 import { AuthScreen } from '@/components/AuthScreen'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const registerSearchSchema = z.object({
   redirect: z.string().optional().catch(undefined),
@@ -51,19 +53,23 @@ function RegisterRoute() {
     register.error instanceof ApiRequestError && Object.keys(register.error.fields).length > 0
 
   return (
-    <AuthScreen title="Criar perfil" onClose={() => navigate({ to: '/' })}>
+    <AuthScreen
+      title="Criar perfil"
+      description="Crie sua conta de colecionador para comprar e favoritar NFTs."
+      onClose={() => navigate({ to: '/' })}
+    >
       <form noValidate onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-2">
         {fields.map((field) => (
           <div key={field.name} className="flex flex-col">
             <label htmlFor={`register-${field.name}`}>{field.label}</label>
-            <input
+            <Input
               id={`register-${field.name}`}
               type={field.type}
               autoComplete={field.autoComplete}
               {...form.register(field.name)}
               aria-invalid={errors[field.name] ? true : undefined}
               aria-describedby={errors[field.name] ? `register-${field.name}-error` : undefined}
-              className="rounded border border-input bg-ink p-2"
+              className="h-12 bg-ink"
             />
             {errors[field.name] && (
               <span id={`register-${field.name}-error`} className="text-destructive">
@@ -79,13 +85,9 @@ function RegisterRoute() {
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={register.isPending}
-          className="mt-2 rounded bg-primary p-2 font-bold text-primary-foreground"
-        >
+        <Button type="submit" disabled={register.isPending} className="mt-4 h-[60px] text-body-lg">
           {register.isPending ? 'Criando...' : 'Criar perfil'}
-        </button>
+        </Button>
       </form>
       <p className="mt-4 text-center">
         Já tem conta?{' '}

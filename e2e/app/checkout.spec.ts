@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { loginThroughUi } from '../support/app'
+import { expectCartCount, loginThroughUi } from '../support/app'
 import { setScenario, startCleanMockServer } from '../support/mock-api'
 
 test.beforeEach(async ({ page }) => {
@@ -7,7 +7,7 @@ test.beforeEach(async ({ page }) => {
   await loginThroughUi(page, 'ana@kurio.dev')
   await page.goto('/nft/sage-nomad-009')
   await page.getByRole('button', { name: 'Comprar' }).click()
-  await expect(page.getByTestId('cart-link')).toHaveText('Carrinho (1)')
+  await expectCartCount(page, 1)
 })
 
 async function reviewOrder(page: Page) {
@@ -25,7 +25,7 @@ test('compra do carrinho até o pedido confirmado', async ({ page }) => {
   await expect(page).toHaveURL(/\/pedidos\/order-/)
   await expect(page.getByTestId('order-status')).toHaveText(/Seus NFTs agora estão na sua carteira/)
   await expect(page.getByText('Transação simulada')).toBeVisible()
-  await expect(page.getByTestId('cart-link')).toHaveText('Carrinho (0)')
+  await expectCartCount(page, 0)
 })
 
 test('preço alterado na hora da compra exige nova confirmação', async ({ page }) => {
