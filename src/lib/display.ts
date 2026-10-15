@@ -1,9 +1,16 @@
 import type { Network } from '@/api/contracts/common'
+import type { Rarity } from '@/api/contracts/nfts'
 
 export const networkLabels: Record<Network, string> = {
   ethereum: 'Ethereum',
   polygon: 'Polygon',
   solana: 'Solana',
+}
+
+export const rarityLabels: Record<Rarity, string> = {
+  common: 'Comum',
+  uncommon: 'Incomum',
+  rare: 'Raro',
 }
 
 // As imagens existem em 400px (cards) e 800px (detalhe/hero).

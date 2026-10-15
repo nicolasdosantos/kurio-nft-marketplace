@@ -20,6 +20,7 @@ function toSummary(nft: Nft): NftSummary {
     originalPriceEth: nft.originalPriceEth,
     isNew: nft.isNew,
     trendingScore: nft.trendingScore,
+    rarity: nft.rarity,
     listedAt: nft.listedAt,
     version: nft.version,
   }

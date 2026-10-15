@@ -52,7 +52,7 @@ test.describe('sessão e conta', () => {
   })
 
   test('senha não fica em texto puro no banco simulado', async ({ page }) => {
-    const storedDb = await page.evaluate(() => localStorage.getItem('kurio:mock-db:v1'))
+    const storedDb = await page.evaluate(() => localStorage.getItem('kurio:mock-db:v2'))
     expect(storedDb).not.toContain('kurio123')
   })
 

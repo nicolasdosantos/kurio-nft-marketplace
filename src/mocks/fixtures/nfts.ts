@@ -1,5 +1,6 @@
 import type { Network } from '@/api/contracts/common'
-import type { Collection, Edition, Nft } from '@/api/contracts/nfts'
+import type { Collection, Edition, Nft, Rarity } from '@/api/contracts/nfts'
+import { rarityLabels } from '@/lib/display'
 
 export const collections: Collection[] = [
   { slug: 'arte-digital', name: 'Arte digital' },
@@ -17,10 +18,34 @@ export const collections: Collection[] = [
 type Artwork = 'emerald' | 'nomad' | 'baron' | 'golden'
 
 const artworkAttributes: Record<Artwork, string[]> = {
-  emerald: ['Óculos', 'Esmeralda', 'Raro'],
-  nomad: ['Chapéu', 'Moletom', 'Comum'],
-  baron: ['Blazer', 'Gola alta', 'Incomum'],
-  golden: ['Fones', 'Jaqueta', 'Raro'],
+  emerald: ['Óculos', 'Esmeralda'],
+  nomad: ['Chapéu', 'Moletom'],
+  baron: ['Blazer', 'Gola alta'],
+  golden: ['Fones', 'Jaqueta'],
+}
+
+// A raridade é de cada NFT, não da arte. O Neon Vessel #552 é o card com o selo RARO no Figma mobile.
+const rareNfts = new Set([
+  'Neon Vessel #552',
+  'Emerald Relic #612',
+  'Signature Ape #010',
+  'Key Baron #104',
+  'Nomad Prism #262',
+  'Baron Guild #295',
+])
+const uncommonNfts = new Set([
+  'Ivory Baron #088',
+  'Golden Track #402',
+  'Baron Render #077',
+  'Emerald Mesh #145',
+  'Quest Baron #923',
+  'Pass Golden #101',
+])
+
+function rarityOf(name: string): Rarity {
+  if (rareNfts.has(name)) return 'rare'
+  if (uncommonNfts.has(name)) return 'uncommon'
+  return 'common'
 }
 
 const contractByNetwork: Record<Network, string> = {
@@ -117,6 +142,7 @@ function buildNft(row: NftRow, index: number): Nft {
   ] = row
   const collection = collections.find((item) => item.slug === collectionSlug)!
   const tokenNumber = name.split('#')[1] ?? String(index)
+  const rarity = rarityOf(name)
   // Os 9 primeiros são os cards do Figma: ficam como os mais recentes, na mesma ordem do layout.
   const listedDaysAgo = index < FIGMA_CARD_COUNT ? index + 1 : daysAgo + FIGMA_CARD_COUNT
 
@@ -131,10 +157,11 @@ function buildNft(row: NftRow, index: number): Nft {
     originalPriceEth,
     isNew: listedDaysAgo <= 7,
     trendingScore,
+    rarity,
     listedAt: new Date(LISTING_BASE_DATE - listedDaysAgo * DAY_MS).toISOString(),
     version: 1,
     description: `${name} é uma obra digital da coleção ${collection.name}, verificada na ${networkLabel[network]}. Cada atributo fica registrado nos metadados do token, com procedência permanente na rede e arte desbloqueável para colecionadores.`,
-    attributes: artworkAttributes[artwork],
+    attributes: [...artworkAttributes[artwork], rarityLabels[rarity]],
     contractAddress: contractByNetwork[network],
     royaltyPercent: 5,
     rating: { average: 4.8, count: index === 0 ? 19 : 3 + (index % 9) },

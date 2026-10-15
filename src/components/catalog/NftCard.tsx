@@ -8,8 +8,8 @@ import { FavoriteButton } from './FavoriteButton'
 const frameClasses =
   'relative flex h-[200px] items-center justify-center rounded-[20px] bg-[linear-gradient(140deg,var(--color-surface-card)_12%,var(--color-surface-raised)_107%)] p-1 md:aspect-[258/300] md:h-auto md:items-start md:rounded-none md:bg-none md:bg-surface-card md:pt-[9%]'
 
-const imageClasses =
-  'aspect-square w-full max-w-[168px] rounded-2xl object-cover md:w-[97%] md:max-w-[250px] md:rounded-[15px]'
+// O tamanho fica no contêiner da imagem, para o selo de raridade acompanhar o topo dela.
+const imageBoxClasses = 'relative aspect-square w-full max-w-[168px] md:w-[97%] md:max-w-[250px]'
 
 export function NftCard({ nft }: { nft: NftSummary }) {
   const image = nftImageSources(nft.imageUrl)
@@ -17,17 +17,25 @@ export function NftCard({ nft }: { nft: NftSummary }) {
   return (
     <article className="relative flex flex-col gap-2 md:gap-3">
       <div className={frameClasses}>
-        <img
-          src={image.src}
-          srcSet={image.srcSet}
-          sizes="(min-width: 768px) 250px, 168px"
-          alt={`Arte do NFT ${nft.name}, da coleção ${nft.collection.name}`}
-          width={250}
-          height={250}
-          loading="lazy"
-          decoding="async"
-          className={imageClasses}
-        />
+        <div className={imageBoxClasses}>
+          <img
+            src={image.src}
+            srcSet={image.srcSet}
+            sizes="(min-width: 768px) 250px, 168px"
+            alt={`Arte do NFT ${nft.name}, da coleção ${nft.collection.name}`}
+            width={250}
+            height={250}
+            loading="lazy"
+            decoding="async"
+            className="size-full rounded-2xl object-cover md:rounded-[15px]"
+          />
+          {/* Selo do Figma mobile: encostado na borda do card, 4px antes da imagem. */}
+          {nft.rarity === 'rare' && (
+            <span className="absolute top-0 -left-1 flex h-8 w-[68px] items-center bg-primary pl-2 text-caption font-medium text-ink md:hidden">
+              RARO
+            </span>
+          )}
+        </div>
         <FavoriteButton
           nftId={nft.id}
           nftName={nft.name}

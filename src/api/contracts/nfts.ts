@@ -18,6 +18,9 @@ export const collectionSchema = z.object({
 })
 export type Collection = z.infer<typeof collectionSchema>
 
+export const raritySchema = z.enum(['common', 'uncommon', 'rare'])
+export type Rarity = z.infer<typeof raritySchema>
+
 export const nftSummarySchema = z.object({
   id: z.string(),
   tokenId: z.string(),
@@ -29,6 +32,7 @@ export const nftSummarySchema = z.object({
   originalPriceEth: ethAmountSchema.nullable(),
   isNew: z.boolean(),
   trendingScore: z.number(),
+  rarity: raritySchema,
   listedAt: z.string(),
   version: z.number().int(),
 })
