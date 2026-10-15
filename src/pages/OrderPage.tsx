@@ -1,6 +1,11 @@
+import { useEffect } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { ApiRequestError } from '@/api/errors'
 import { useOrder } from '@/api/orders'
+import { queryKeys } from '@/api/query-keys'
+import { clearCheckoutAttempt, readCheckoutAttempt } from '@/lib/checkout-attempt'
+import { cacheOwner, useSession } from '@/session/session-store'
 
 const failureMessages = {
   PAYMENT_DECLINED: 'O pagamento foi recusado pela carteira.',
@@ -9,6 +14,19 @@ const failureMessages = {
 
 export function OrderPage({ orderId }: { orderId: string }) {
   const orderQuery = useOrder(orderId)
+  const session = useSession()
+  const queryClient = useQueryClient()
+  const status = orderQuery.data?.status
+
+  // Pedido resolvido (pelo socket ou pela consulta a cada 3s): o servidor já tirou do
+  // carrinho só o que foi comprado, então o carrinho é buscado de novo. A tentativa
+  // guardada para recuperar após refresh deixa de ser necessária.
+  useEffect(() => {
+    if (status !== 'confirmed' && status !== 'declined') return
+    queryClient.invalidateQueries({ queryKey: queryKeys.cart(cacheOwner(session)) })
+    const userId = session.user?.id
+    if (userId && readCheckoutAttempt(userId)?.orderId === orderId) clearCheckoutAttempt()
+  }, [status, orderId, queryClient, session])
 
   if (orderQuery.isPending) return <main className="p-4">Carregando pedido...</main>
 
