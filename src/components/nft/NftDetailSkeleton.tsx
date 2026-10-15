@@ -21,6 +21,7 @@ export function NftDetailSkeleton({ isTabletUp }: { isTabletUp: boolean }) {
           <Skeleton className="h-[52px] w-3/5" />
           <Skeleton className="h-[84px] w-4/5" />
         </div>
+        <SectionsSkeleton />
       </div>
     )
   }
@@ -48,6 +49,20 @@ export function NftDetailSkeleton({ isTabletUp }: { isTabletUp: boolean }) {
           <Skeleton className="h-[114px] w-80" />
         </div>
       </div>
+      <div className="mt-24">
+        <SectionsSkeleton />
+      </div>
+    </div>
+  )
+}
+
+// Abas e "Mais desta coleção": sem elas, o rodapé aparece logo abaixo do skeleton e
+// é empurrado para baixo quando os dados chegam.
+function SectionsSkeleton() {
+  return (
+    <div className="flex flex-col gap-24 px-6 pt-12 md:px-0 md:pt-0">
+      <Skeleton className="h-[340px]" />
+      <Skeleton className="h-[407px]" />
     </div>
   )
 }
