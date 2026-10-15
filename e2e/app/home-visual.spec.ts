@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test'
 import { startCleanMockServer } from '../support/mock-api'
 
+// Fontes e renderização mudam de um sistema para outro: a comparação só vale dentro
+// da imagem oficial do Playwright (pnpm test:visual).
+test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
+
 test('regressão visual do Início', async ({ page }) => {
   await startCleanMockServer(page)
   await page.reload()

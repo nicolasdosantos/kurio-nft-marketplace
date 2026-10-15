@@ -11,6 +11,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],
+  // Sem o sistema no nome: as baselines são geradas sempre no Docker (pnpm test:visual:update).
+  snapshotPathTemplate: '{testDir}/{testFilePath}-snapshots/{arg}-{projectName}{ext}',
   use: {
     baseURL: externalBaseUrl ?? `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
