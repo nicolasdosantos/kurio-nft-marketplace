@@ -248,7 +248,11 @@ export function CartPage() {
             Carrinho de NFTs
           </h1>
         </div>
-        {content}
+        {/* Altura de um carrinho com 3 itens: skeleton, vazio e carrinho pequeno ocupam o
+            mesmo espaço e o carrossel de baixo não pula (CLS). */}
+        <div data-testid="cart-content" className="min-h-[692px] md:min-h-[712px] lg:min-h-[365px]">
+          {content}
+        </div>
         <div className="mt-24 px-6">
           <AlsoViewed cartItems={items} />
         </div>
@@ -266,7 +270,11 @@ export function CartPage() {
           </Link>{' '}
           / <span aria-current="page">Carrinho</span>
         </nav>
-        {content}
+        {/* Altura de um carrinho com 3 itens: skeleton, vazio e carrinho pequeno ocupam o
+            mesmo espaço e o carrossel de baixo não pula (CLS). */}
+        <div data-testid="cart-content" className="min-h-[692px] md:min-h-[712px] lg:min-h-[365px]">
+          {content}
+        </div>
       </div>
       <AlsoViewed cartItems={items} />
     </main>
@@ -523,7 +531,7 @@ function CartSkeleton({ isTabletUp }: { isTabletUp: boolean }) {
           <Skeleton key={index} className="h-[70px]" />
         ))}
       </div>
-      <Skeleton className="h-[388px] lg:w-[332px]" />
+      <Skeleton className="h-[365px] lg:w-[332px]" />
     </div>
   )
 }
