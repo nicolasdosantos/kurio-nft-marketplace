@@ -82,6 +82,9 @@ export const cartHandlers = [
     if (parsed.body.quantity > limit) return outOfStock(limit)
 
     cartItem.quantity = parsed.body.quantity
+    // Mexer na quantidade é aceitar o preço que está na tela: o aviso de preço alterado some.
+    const { nft } = findEdition(cartItem.nftId, cartItem.editionId)
+    if (nft) cartItem.addedPriceEth = nft.priceEth
     cart.version += 1
     saveDb()
     return HttpResponse.json(toCartResponse(cart))

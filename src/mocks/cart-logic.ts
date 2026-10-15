@@ -70,6 +70,7 @@ export function toCartResponse(cart: StoredCart): Cart {
         unitPriceEth: nft.priceEth,
         addedPriceEth: item.addedPriceEth,
         stock: edition.stock,
+        maxPerOrder: edition.maxPerOrder,
       },
     ]
   })

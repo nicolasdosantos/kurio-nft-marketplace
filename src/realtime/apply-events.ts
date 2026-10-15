@@ -65,9 +65,19 @@ export function applyNftUpdated(queryClient: QueryClient, owner: string, event: 
     // Preço e estoque do carrinho vêm do servidor: busca de novo em vez de calcular aqui.
     queryClient.invalidateQueries({ queryKey: queryKeys.cart(owner) })
     queryClient.invalidateQueries({ queryKey: ['owner', owner, 'quote'] })
+    const messages: string[] = []
     if (cartItem.unitPriceEth !== event.data.priceEth) {
-      announce(`O preço de ${cartItem.name} mudou para ${event.data.priceEth} ETH.`)
+      messages.push(`O preço de ${cartItem.name} mudou para ${event.data.priceEth} ETH.`)
     }
+    const newStock = event.data.editions.find((item) => item.id === cartItem.editionId)?.stock
+    if (newStock !== undefined && newStock < cartItem.quantity) {
+      messages.push(
+        newStock === 0
+          ? `${cartItem.name}, edição ${cartItem.editionLabel}, esgotou.`
+          : `${cartItem.name}, edição ${cartItem.editionLabel}: restam só ${newStock}.`,
+      )
+    }
+    if (messages.length > 0) announce(messages.join(' '))
   }
 }
 

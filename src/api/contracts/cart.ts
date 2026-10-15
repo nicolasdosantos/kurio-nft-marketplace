@@ -15,6 +15,7 @@ export const cartItemSchema = z.object({
   // Preço quando o item entrou no carrinho; se for diferente do atual, a UI avisa.
   addedPriceEth: ethAmountSchema,
   stock: z.number().int().min(0),
+  maxPerOrder: z.number().int().min(1),
 })
 export type CartItem = z.infer<typeof cartItemSchema>
 
