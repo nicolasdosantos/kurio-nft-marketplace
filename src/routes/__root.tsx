@@ -31,9 +31,11 @@ function RootLayout() {
   // Header e tab bar não ficam escondidos por CSS: o que não aparece nem é renderizado,
   // para não baixar os ícones do outro layout.
   const isTabletUp = useMediaQuery('(min-width: 768px)')
-  // No detalhe do NFT, a barra de compra do Figma mobile ocupa o lugar da tab bar.
-  const isNftDetail = useRouterState({
-    select: (state) => state.location.pathname.startsWith('/nft/'),
+  // No detalhe do NFT e no carrinho, o Figma mobile não tem tab bar: a barra de compra
+  // e o resumo do pedido ficam no lugar dela, e as duas telas têm botão de voltar.
+  const hideTabBar = useRouterState({
+    select: (state) =>
+      state.location.pathname.startsWith('/nft/') || state.location.pathname === '/carrinho',
   })
 
   return (
@@ -49,7 +51,7 @@ function RootLayout() {
         <Outlet />
       </div>
       <SiteFooter />
-      {!isTabletUp && !isNftDetail && <MobileTabBar />}
+      {!isTabletUp && !hideTabBar && <MobileTabBar />}
       <span className="sr-only">
         Tempo real:{' '}
         <span data-testid="socket-status">{socketConnected ? 'conectado' : 'desconectado'}</span>

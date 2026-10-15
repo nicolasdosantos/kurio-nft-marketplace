@@ -19,9 +19,20 @@ interface QuantityStepperProps {
   max: number
   onChange: (quantity: number) => void
   size: keyof typeof sizes
+  // Enquanto uma alteração está em andamento, nenhum dos dois botões responde.
+  disabled?: boolean
+  // Nome do grupo para o leitor de tela (no carrinho, "Quantidade de <NFT>").
+  label?: string
 }
 
-export function QuantityStepper({ value, max, onChange, size }: QuantityStepperProps) {
+export function QuantityStepper({
+  value,
+  max,
+  onChange,
+  size,
+  disabled = false,
+  label = 'Quantidade',
+}: QuantityStepperProps) {
   const style = sizes[size]
   const buttonClasses = cn(
     'grid shrink-0 place-items-center border border-ink bg-primary hover:bg-text-accent disabled:cursor-not-allowed disabled:opacity-40',
@@ -29,11 +40,11 @@ export function QuantityStepper({ value, max, onChange, size }: QuantityStepperP
   )
 
   return (
-    <div role="group" aria-label="Quantidade" className="flex items-center gap-3">
+    <div role="group" aria-label={label} className="flex items-center gap-3">
       <button
         type="button"
         aria-label="Diminuir quantidade"
-        disabled={value <= 1}
+        disabled={disabled || value <= 1}
         onClick={() => onChange(value - 1)}
         className={buttonClasses}
       >
@@ -49,7 +60,7 @@ export function QuantityStepper({ value, max, onChange, size }: QuantityStepperP
       <button
         type="button"
         aria-label="Aumentar quantidade"
-        disabled={value >= max}
+        disabled={disabled || value >= max}
         onClick={() => onChange(value + 1)}
         className={buttonClasses}
       >
