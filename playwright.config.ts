@@ -8,6 +8,9 @@ const externalBaseUrl = process.env.BASE_URL
 export default defineConfig({
   testDir: './e2e',
   fullyParallel: true,
+  // Contra o deploy cada teste abre o site sem cache e baixa tudo (inclusive o worker do
+  // MSW) pela internet; com a suíte em paralelo, só o beforeEach pode passar de 15s.
+  timeout: externalBaseUrl ? 60_000 : 30_000,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   reporter: [['html', { open: 'never' }], ['list']],
