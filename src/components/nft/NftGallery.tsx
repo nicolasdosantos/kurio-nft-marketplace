@@ -58,7 +58,8 @@ export function NftGallery({ nft, viewIndex, onViewChange }: GalleryProps) {
       <div className="relative w-full max-w-[444px] self-start rounded-md bg-surface-card p-4">
         <div className="aspect-square overflow-hidden rounded-3xl">
           <img
-            src={nft.imageUrl}
+            {...nftImageSources(nft.imageUrl)}
+            sizes="404px"
             alt={galleryAlt(nft, viewIndex)}
             width={404}
             height={404}
@@ -131,7 +132,8 @@ export function MobileNftHero({
       <div className="relative mt-2">
         <div className="aspect-[361/356] overflow-hidden rounded-3xl">
           <img
-            src={nft.imageUrl}
+            {...nftImageSources(nft.imageUrl)}
+            sizes="calc(100vw - 56px)"
             alt={galleryAlt(nft, viewIndex)}
             width={361}
             height={356}
