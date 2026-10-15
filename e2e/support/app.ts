@@ -54,8 +54,9 @@ export async function openProfile(page: Page) {
     await page.getByTestId('current-user').click()
     await page.getByRole('menuitem', { name: 'Dados do perfil' }).click()
   } else {
-    // No detalhe do NFT a tab bar dá lugar à barra de compra: volta antes, como o usuário faria.
-    if (new URL(page.url()).pathname.startsWith('/nft/')) {
+    // No detalhe do NFT e no carrinho não há tab bar: volta antes, como o usuário faria.
+    const pathname = new URL(page.url()).pathname
+    if (pathname.startsWith('/nft/') || pathname === '/carrinho') {
       await page.getByRole('button', { name: 'Voltar' }).click()
     }
     await page.getByRole('link', { name: 'Minha conta' }).click()
@@ -105,4 +106,16 @@ export async function searchCatalog(page: Page, text: string) {
   }
   await page.getByRole('searchbox', { name: 'Buscar NFTs' }).filter({ visible: true }).fill(text)
   await page.keyboard.press('Enter')
+}
+
+// O elemento com foco precisa mostrar o anel de foco (outline).
+export async function expectFocusVisible(page: Page) {
+  const outline = await page.evaluate(() => {
+    const element = document.activeElement
+    // O rádio é invisível (sr-only); o anel de foco aparece no pill logo depois dele.
+    const isRadio = element instanceof HTMLInputElement && element.type === 'radio'
+    const target = isRadio ? element.nextElementSibling : element
+    return target ? getComputedStyle(target).outlineStyle : 'none'
+  })
+  expect(outline).not.toBe('none')
 }

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test'
-import { expectCartCount, isDesktopLayout } from '../support/app'
+import { expectCartCount, expectFocusVisible, isDesktopLayout } from '../support/app'
 import { callApi, setScenario, startCleanMockServer } from '../support/mock-api'
 
 // Sage Nomad #009: 1/1 com 1, 1/10 com 9, 1/50 com 49 e Aberta com 999 (máximo 20 por pedido).
@@ -23,16 +23,6 @@ async function chooseEdition(page: Page, label: string) {
 async function openSage(page: Page) {
   await page.goto(SAGE)
   await expect(page.getByRole('heading', { level: 1, name: 'Sage Nomad #009' })).toBeVisible()
-}
-
-async function expectFocusVisible(page: Page) {
-  const outline = await page.evaluate(() => {
-    const element = document.activeElement
-    // O rádio é invisível (sr-only); o anel de foco aparece no pill logo depois dele.
-    const target = element instanceof HTMLInputElement ? element.nextElementSibling : element
-    return target ? getComputedStyle(target).outlineStyle : 'none'
-  })
-  expect(outline).not.toBe('none')
 }
 
 test.beforeEach(async ({ page }) => {
