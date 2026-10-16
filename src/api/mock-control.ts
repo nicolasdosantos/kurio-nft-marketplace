@@ -1,17 +1,7 @@
 import { http } from './http'
 
-// Chamadas ao "servidor" simulado. Só a página da PoC e o painel de demonstração usam.
-export async function raiseNftPrice(nftId: string) {
-  await http.post(`/mock-control/nfts/${nftId}`, { raiseByEth: '0.10' })
-}
-
-export async function replayNftEvent(nftId: string, which: 'last' | 'previous') {
-  await http.post(`/mock-control/nfts/${nftId}/replay-event`, { which })
-}
-
-export async function setRealtimeOnline(online: boolean) {
-  await http.post(`/mock-control/realtime/${online ? 'online' : 'offline'}`)
-}
+// Chamadas à API de controle dos mocks (/api/mock-control). Só o painel de simulação usa;
+// os testes chamam a mesma API direto pelo fetch.
 
 export interface MockScenarioState {
   name: string

@@ -7,18 +7,6 @@ import { queryKeys } from './query-keys'
 
 const PENDING_REFETCH_MS = 3000
 
-export function useOrders() {
-  const session = useSession()
-  return useQuery({
-    queryKey: queryKeys.orders(cacheOwner(session)),
-    queryFn: async ({ signal }) => {
-      const response = await http.get<Order[]>('/orders', { signal })
-      return response.data
-    },
-    enabled: session.user !== null,
-  })
-}
-
 // null: ainda não há pedido (ex.: pagamento antes de confirmar).
 export function useOrder(orderId: string | null) {
   const session = useSession()

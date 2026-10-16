@@ -29,7 +29,7 @@ export function NftGallery({ nft, viewIndex, onViewChange }: GalleryProps) {
   const thumbnail = nftImageSources(nft.imageUrl).src
 
   return (
-    // Largura do Figma (100 + 28 + 444): sem ela, o skeleton não reserva o lugar da imagem.
+    // Largura fixa no desktop: sem ela, o skeleton não reserva o lugar da imagem.
     <div className="flex w-full gap-7 lg:w-[572px] lg:shrink-0">
       <div role="group" aria-label="Imagens do NFT" className="flex shrink-0 flex-col gap-4">
         {galleryViews.map((item, index) => (

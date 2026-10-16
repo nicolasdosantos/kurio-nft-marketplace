@@ -265,8 +265,7 @@ export function CartPage() {
   }
 
   return (
-    // Como no Pagamento: no Figma o conteúdo começa em y=101 e o header do app é 9px mais
-    // baixo que a linha do header desses frames.
+    // 41px: compensa o header do app, mais baixo que o dos frames (como no Pagamento).
     <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px]">
       <div className="flex flex-col gap-3">
         <h1 className="sr-only">Carrinho de NFTs</h1>

@@ -1,5 +1,5 @@
-// Redesenho do ícone "thank-you" do Figma (nó 11:5150): o SVG original não pôde ser
-// exportado (API de imagens bloqueada). Decorativo: o título ao lado diz o mesmo.
+// Ícone "thank-you" redesenhado: o SVG original do Figma não pôde ser exportado.
+// Decorativo: o título ao lado diz o mesmo.
 export function ThankYouIcon({ className }: { className?: string }) {
   return (
     <svg

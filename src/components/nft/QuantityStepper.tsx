@@ -1,6 +1,5 @@
 import { cn } from '@/lib/utils'
 
-// Tamanhos do Figma: botões 33×50 no desktop e 20×30 na barra de compra do mobile.
 const sizes = {
   large: {
     button: 'h-[50px] w-[33px] rounded-[33px] shadow-[0_6.6px_19.8px_-3.3px_rgb(20_13_10/0.15)]',

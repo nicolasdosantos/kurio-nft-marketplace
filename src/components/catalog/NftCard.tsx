@@ -29,7 +29,6 @@ export function NftCard({ nft }: { nft: NftSummary }) {
             decoding="async"
             className="size-full rounded-2xl object-cover md:rounded-[15px]"
           />
-          {/* Selo do Figma mobile: encostado na borda do card, 4px antes da imagem. */}
           {nft.rarity === 'rare' && (
             <span className="absolute top-0 -left-1 flex h-8 w-[68px] items-center bg-primary pl-2 text-caption font-medium text-ink md:hidden">
               RARO

@@ -12,7 +12,7 @@ interface NftCarouselProps {
   isPending: boolean
 }
 
-// Carrossel de cards do Figma ("Mais desta coleção", "Colecionadores também viram").
+// Carrossel de cards ("Mais desta coleção", "Colecionadores também viram").
 export function NftCarousel({ title, items, isPending }: NftCarouselProps) {
   const titleId = useId()
   const isDesktop = useIsDesktop()

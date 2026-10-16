@@ -6,7 +6,7 @@ import { callApi, login, orderBody, startCleanMockServer } from '../support/mock
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
-// Os mesmos itens do frame 11:4385.
+// Os mesmos itens do frame do Figma.
 const items = [
   ['emerald-ape-042', '1-50', 2],
   ['violet-nomad-314', 'open', 6],

@@ -6,7 +6,7 @@ import { callApi, login, startCleanMockServer } from '../support/mock-api'
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
-// Desktop: os itens do frame 11:2862. O frame mobile (16:748) não mostra itens.
+// Desktop: os itens do frame do Figma. O frame mobile não mostra itens.
 const desktopItems = [
   ['emerald-ape-042', '1-50', 2],
   ['violet-nomad-314', 'open', 6],

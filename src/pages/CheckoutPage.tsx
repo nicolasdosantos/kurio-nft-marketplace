@@ -564,8 +564,7 @@ export function CheckoutPage() {
   }
 
   return (
-    // Nos frames do Figma a linha do header vai até y=69 e o conteúdo começa em y=101;
-    // o header do app é 9px mais baixo, então a distância aqui é 41px em vez de 32px.
+    // 41px em vez de 32px: o header do app é 9px mais baixo que o dos frames do Figma.
     <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px]">
       <h1 className="sr-only">Pagamento</h1>
       <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">

@@ -138,7 +138,7 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
             </p>
             <div className="h-px bg-primary/30" />
             <dl>
-              {/* Desktop: linha com recuo de 42px; mobile: "Total:" à direita, como no Figma. */}
+              {/* Desktop: linha recuada; mobile: "Total:" à direita. */}
               <div
                 className={cn(
                   'flex items-center gap-4',

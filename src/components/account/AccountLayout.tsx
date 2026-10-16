@@ -61,7 +61,7 @@ export function AccountLayout({ section, children }: AccountLayoutProps) {
 
   if (isDesktop) {
     return (
-      // Como no Pagamento: o conteúdo começa em y=101 no Figma, 41px abaixo do header do app.
+      // 41px: compensa o header do app, mais baixo que o dos frames (como no Pagamento).
       <main className="mx-auto grid w-full max-w-[1232px] grid-cols-[310px_minmax(0,1fr)] items-start gap-7 px-4 pt-[41px]">
         <nav
           aria-label="Menu da conta"
@@ -168,7 +168,6 @@ function SidebarItem({ item, active }: { item: NavItem; active: boolean }) {
       className={cn(
         base,
         'hover:bg-surface-raised',
-        // Barra de 6px à esquerda do item ativo, como no Figma.
         active && 'before:absolute before:inset-y-0 before:left-0 before:w-1.5 before:bg-primary',
       )}
     >

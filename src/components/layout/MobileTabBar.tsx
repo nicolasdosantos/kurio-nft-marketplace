@@ -2,8 +2,8 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { useCartCount } from '@/api/cart'
 import { useSession } from '@/session/session-store'
 
-// Posições tiradas do frame mobile do Figma (414 × 126): os ícones laterais em %
-// da largura, para acompanhar telas menores, e o ícone central relativo ao círculo.
+// Ícones laterais posicionados em % da largura, para a barra acompanhar telas menores;
+// as peças do ícone central são relativas ao círculo.
 const scanIconPieces = [
   { src: '/icons/tabbar-scan-5.svg', left: 20.3, top: 21, width: 10.4 },
   { src: '/icons/tabbar-scan-3.svg', left: 34.1, top: 21.1, width: 10.4 },
