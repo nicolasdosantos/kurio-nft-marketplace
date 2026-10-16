@@ -14,8 +14,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:report": "playwright show-report",
-    "test:visual": "node scripts/playwright-docker.mjs e2e/app/home-visual.spec.ts e2e/app/detail-visual.spec.ts e2e/app/cart-visual.spec.ts e2e/app/auth-visual.spec.ts e2e/app/checkout-visual.spec.ts e2e/app/order-visual.spec.ts",
-    "test:visual:update": "node scripts/playwright-docker.mjs e2e/app/home-visual.spec.ts e2e/app/detail-visual.spec.ts e2e/app/cart-visual.spec.ts e2e/app/auth-visual.spec.ts e2e/app/checkout-visual.spec.ts e2e/app/order-visual.spec.ts --update-snapshots=all",
+    "test:visual": "node scripts/playwright-docker.mjs e2e/app/home-visual.spec.ts e2e/app/detail-visual.spec.ts e2e/app/cart-visual.spec.ts e2e/app/auth-visual.spec.ts e2e/app/checkout-visual.spec.ts e2e/app/order-visual.spec.ts e2e/app/account-visual.spec.ts",
+    "test:visual:update": "node scripts/playwright-docker.mjs e2e/app/home-visual.spec.ts e2e/app/detail-visual.spec.ts e2e/app/cart-visual.spec.ts e2e/app/auth-visual.spec.ts e2e/app/checkout-visual.spec.ts e2e/app/order-visual.spec.ts e2e/app/account-visual.spec.ts --update-snapshots=all",
     "lighthouse": "pnpm build && lhci autorun"
   },
   "dependencies": {

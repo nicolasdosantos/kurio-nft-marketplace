@@ -48,6 +48,11 @@ export async function loginThroughUi(page: Page, email: string) {
   await waitForApiIdle()
 }
 
+// Campo de e-mail do formulário do perfil (o rótulo visível é só "E-mail").
+export function profileEmail(page: Page) {
+  return page.getByRole('textbox', { name: 'E-mail', exact: true })
+}
+
 // Desktop: menu do usuário no header. Mobile: ícone de conta na tab bar.
 export async function openProfile(page: Page) {
   if (isDesktopLayout(page)) {
@@ -61,7 +66,7 @@ export async function openProfile(page: Page) {
     }
     await page.getByRole('link', { name: 'Minha conta' }).click()
   }
-  await expect(page.getByTestId('profile-email')).toBeVisible()
+  await expect(profileEmail(page)).toBeVisible()
 }
 
 export async function logoutThroughUi(page: Page) {
@@ -112,9 +117,10 @@ export async function searchCatalog(page: Page, text: string) {
 export async function expectFocusVisible(page: Page) {
   const outline = await page.evaluate(() => {
     const element = document.activeElement
-    // O rádio é invisível (sr-only); o anel de foco aparece no pill logo depois dele.
-    const isRadio = element instanceof HTMLInputElement && element.type === 'radio'
-    const target = isRadio ? element.nextElementSibling : element
+    // Rádio e checkbox são invisíveis (sr-only); o anel de foco aparece logo depois deles.
+    const isHiddenInput =
+      element instanceof HTMLInputElement && ['radio', 'checkbox'].includes(element.type)
+    const target = isHiddenInput ? element.nextElementSibling : element
     return target ? getComputedStyle(target).outlineStyle : 'none'
   })
   expect(outline).not.toBe('none')
