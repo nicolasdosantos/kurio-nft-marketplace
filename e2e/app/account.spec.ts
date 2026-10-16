@@ -351,9 +351,7 @@ test('os dados da Ana nunca aparecem para o Bruno', async ({ page }) => {
   expect(JSON.stringify(wallets.body)).not.toContain(anaPrimaryAddress)
 })
 
-test('teclado: navegação da conta, foco visível e itens "em breve" fora do Tab', async ({
-  page,
-}) => {
+test('teclado: navegação da conta, foco visível e itens "em breve" sem ação', async ({ page }) => {
   await loginThroughUi(page, 'ana@kurio.dev')
   await page.goto('/perfil')
   const nav = page.getByRole('navigation', { name: 'Menu da conta' })
@@ -365,10 +363,14 @@ test('teclado: navegação da conta, foco visível e itens "em breve" fora do Ta
   const walletsLink = nav.getByRole('link', { name: 'Carteiras' })
   await expect(walletsLink).toBeFocused()
   await expectFocusVisible(page)
-  // Atividade, Lista de interesse, Ofertas, Arquivos baixados e Suporte não recebem foco.
+  // Os itens "em breve" recebem foco para mostrar o tooltip, mas Enter não faz nada.
   await page.keyboard.press('Tab')
-  await expect(nav.getByText('Atividade')).not.toBeFocused()
-  await expect(nav.getByText('Atividade')).toHaveAttribute('aria-disabled', 'true')
+  const activity = nav.locator('[aria-disabled="true"]', { hasText: 'Atividade' })
+  await expect(activity).toBeFocused()
+  await expect(activity.getByText('Em breve', { exact: true })).toBeVisible()
+  await page.keyboard.press('Enter')
+  await expect(page).toHaveURL(/\/perfil$/)
+  await expect(nav.getByText('Suporte')).toHaveAttribute('aria-disabled', 'true')
   await expect(nav.getByText('Suporte')).toContainText('(em breve)')
 
   await walletsLink.press('Enter')
