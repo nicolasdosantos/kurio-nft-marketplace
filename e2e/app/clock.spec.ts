@@ -18,12 +18,12 @@ async function skipMinutes(page: Page, minutes: number) {
   await page.clock.setSystemTime(now + minutes * 60_000)
 }
 
-async function openProfileMenu(page: Page) {
+async function openProfileMenu(page: Page, timeout?: number) {
   if (isDesktopLayout(page)) {
-    await page.getByTestId('current-user').click()
-    await page.getByRole('menuitem', { name: 'Dados do perfil' }).click()
+    await page.getByTestId('current-user').click({ timeout })
+    await page.getByRole('menuitem', { name: 'Dados do perfil' }).click({ timeout })
   } else {
-    await page.getByRole('link', { name: 'Minha conta' }).click()
+    await page.getByRole('link', { name: 'Minha conta' }).click({ timeout })
   }
 }
 
@@ -40,13 +40,18 @@ test('token vence durante a navegação: login de novo e volta para onde estava'
   await page.getByRole('link', { name: 'Início', exact: true }).first().click()
   await expect(page).toHaveURL(/\/$/)
   await skipMinutes(page, 1.5)
-  await openProfileMenu(page)
+  // Abrir o perfil faz uma requisição autenticada. Às vezes uma busca de fundo do Início
+  // recebe o 401 antes e o app já vai para o login: os dois caminhos valem.
+  await openProfileMenu(page, 5_000).catch(() => undefined)
   await expect(page).toHaveURL(/\/login\?.*expired=true/)
   await expect(page.getByText('Sua sessão expirou')).toBeVisible()
 
+  // Depois de entrar de novo, volta exatamente para onde estava.
+  const redirect = new URL(page.url()).searchParams.get('redirect') ?? ''
+  expect(['/', '/perfil']).toContain(redirect)
   await loginThroughUi(page, 'ana@kurio.dev')
-  await expect(page).toHaveURL(/\/perfil$/)
-  await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
+  await expect(page).toHaveURL(new RegExp(`${redirect.replace('/', '\\/')}$`))
+  if (redirect === '/perfil') await expect(profileEmail(page)).toHaveValue('ana@kurio.dev')
 })
 
 test('token vence durante o checkout: volta ao pagamento e compra uma vez só', async ({ page }) => {
