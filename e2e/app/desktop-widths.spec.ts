@@ -1,6 +1,12 @@
 import { expect, test, type Page } from '@playwright/test'
 import { expectCartCount, expectNoHorizontalScroll, loginThroughUi } from '../support/app'
-import { callApi, orderBody, prepareCheckout, startCleanMockServer } from '../support/mock-api'
+import {
+  callApi,
+  orderBody,
+  prepareCheckout,
+  startCleanMockServer,
+  waitForMocks,
+} from '../support/mock-api'
 
 // Larguras de monitor comuns, incluindo 1920 com escala de 125% (1536) e 150% (1280) do Windows.
 const widths = [1024, 1152, 1280, 1366, 1440, 1536, 1600, 1920, 2560]
@@ -165,15 +171,17 @@ test('modais cabem ou rolam por dentro em janelas baixas e altas', async ({ page
   for (const size of sizes) {
     await page.setViewportSize(size)
     for (const path of ['/login', '/cadastro']) {
-      await page.goto(path)
+      await goto(page, path)
       await expectDialogFits(page, `${path} em ${size.width}x${size.height}`)
     }
   }
 
+  await goto(page, '/login')
+  await waitForMocks(page)
   await loginThroughUi(page, 'ana@kurio.dev')
   for (const size of sizes) {
     await page.setViewportSize(size)
-    await page.goto('/pedidos/order-ana-0001')
+    await goto(page, '/pedidos/order-ana-0001')
     await expectDialogFits(page, `comprovante em ${size.width}x${size.height}`)
   }
 })
