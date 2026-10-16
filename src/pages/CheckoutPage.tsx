@@ -122,7 +122,9 @@ export function CheckoutPage() {
   const { errors } = form.formState
 
   function sendOrder(idempotencyKey: string, order: CreateOrderRequest) {
+    // A partir daqui quem informa é o painel do pedido; a mensagem anterior sai.
     setNotice('')
+    setWalletMessage('')
     saveCheckoutAttempt({ userId, idempotencyKey, order })
     createOrder.mutate(
       { idempotencyKey, order },
