@@ -38,6 +38,7 @@ function RootLayout() {
       const { pathname } = state.location
       return (
         pathname.startsWith('/nft/') ||
+        pathname.startsWith('/pedidos/') ||
         ['/carrinho', '/pagamento', '/login', '/cadastro'].includes(pathname)
       )
     },

@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { EllipsisVertical, Wallet as WalletIcon } from 'lucide-react'
 import type { Wallet, WalletSlot, WalletsResponse, WalletType } from '@/api/contracts/account'
 import type { Network } from '@/api/contracts/common'
-import { walletSlotLabels, walletTypeLabels } from '@/lib/display'
+import { shortHex, walletSlotLabels, walletTypeLabels } from '@/lib/display'
 import { cn } from '@/lib/utils'
 
 type Variant = 'desktop' | 'mobile'
@@ -12,10 +12,6 @@ const networkDescriptions: Record<Network, string> = {
   ethereum: 'Rede principal Ethereum',
   polygon: 'Rede Polygon',
   solana: 'Rede Solana',
-}
-
-function shortAddress(address: string) {
-  return `${address.slice(0, 6)}…${address.slice(-4)}`
 }
 
 // Círculo do rádio do Figma; o input de verdade fica escondido logo antes.
@@ -169,9 +165,7 @@ function WalletCard({
           <span className="flex min-w-0 flex-col gap-1.5">
             <span className="text-body-md leading-4 font-bold text-foreground">{label}</span>
             <span className="text-body-sm leading-[22px] text-text-secondary">
-              <span className="block truncate">
-                {wallet.ensName || shortAddress(wallet.address)}
-              </span>
+              <span className="block truncate">{wallet.ensName || shortHex(wallet.address)}</span>
               <span className="block truncate">{networkDescriptions[wallet.network]}</span>
             </span>
           </span>

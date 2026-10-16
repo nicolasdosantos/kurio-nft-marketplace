@@ -38,3 +38,29 @@ export function nftImageSources(imageUrl: string) {
 export function formatEthWithComma(value: string) {
   return value.replace('.', ',')
 }
+
+// Endereço ou hash encurtado como no Figma: "0xA91F…E82C".
+export function shortHex(value: string) {
+  return `${value.slice(0, 6)}…${value.slice(-4)}`
+}
+
+const monthAbbreviations = [
+  'Jan',
+  'Fev',
+  'Mar',
+  'Abr',
+  'Mai',
+  'Jun',
+  'Jul',
+  'Ago',
+  'Set',
+  'Out',
+  'Nov',
+  'Dez',
+]
+
+// Data do recibo no formato do Figma ("29 Jul, 2026"), com os meses em português.
+export function formatReceiptDate(iso: string) {
+  const date = new Date(iso)
+  return `${date.getDate()} ${monthAbbreviations[date.getMonth()]}, ${date.getFullYear()}`
+}
