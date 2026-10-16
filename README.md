@@ -120,11 +120,13 @@ O `pnpm test` sobe o build e o preview sozinho. Com `BASE_URL=<url>` ele roda co
 
 Início e Detalhe, no celular (4G simulado) e no desktop, 3 medições cada contra a URL pública. Os números são a mediana; o resultado completo fica em [`lighthouse/resultados.md`](./lighthouse/resultados.md) e dá para refazer com `pnpm lighthouse`.
 
-| Página  | Perfil  | Performance | Accessibility | Best Practices | SEO |    LCP | CLS |   TBT |
-| ------- | ------- | ----------: | ------------: | -------------: | --: | -----: | --: | ----: |
-| Início  | mobile  |          96 |           100 |            100 | 100 | 2,40 s |   0 | 67 ms |
-| Início  | desktop |         100 |           100 |            100 | 100 | 0,56 s |   0 |  0 ms |
-| Detalhe | mobile  |          91 |           100 |            100 | 100 | 3,17 s |   0 | 46 ms |
-| Detalhe | desktop |         100 |           100 |            100 | 100 | 0,66 s |   0 |  0 ms |
+| Página  | Perfil  | Performance | Accessibility | Best Practices | SEO |    LCP | CLS |    TBT |
+| ------- | ------- | ----------: | ------------: | -------------: | --: | -----: | --: | -----: |
+| Início  | mobile  |          90 |           100 |            100 | 100 | 3,17 s |   0 |  64 ms |
+| Início  | desktop |         100 |           100 |            100 | 100 | 0,57 s |   0 |   8 ms |
+| Detalhe | mobile  |          89 |           100 |            100 | 100 | 3,21 s |   0 | 120 ms |
+| Detalhe | desktop |          99 |           100 |            100 | 100 | 0,68 s |   0 |   0 ms |
 
 O Detalhe no celular é o mais lento porque a imagem principal só pode ser pedida depois que a API simulada responde, e antes disso o navegador precisa baixar o worker do MSW. Explico melhor no ARCHITECTURE.md.
+
+O Detalhe no celular ficou 1 ponto abaixo da meta de 90 nesta medição. O Lighthouse simula o 4G e a CPU lenta a partir da rede e do processador da máquina que mede: numa máquina mais rápida, com o mesmo código no caminho do LCP, o Início deu 96 e o Detalhe 91. Aqui o LCP do Detalhe ficou igual (3,2 s); o que pesou foi o tempo de bloqueio (TBT), quase todo na inicialização do worker do MSW, que a entrega precisa carregar.
