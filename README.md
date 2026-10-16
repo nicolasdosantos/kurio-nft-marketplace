@@ -29,7 +29,7 @@ pnpm exec playwright install chromium
 pnpm dev                         # http://localhost:5173
 ```
 
-A regressão visual roda dentro da imagem oficial do Playwright, porque as capturas mudam com as fontes e a renderização de cada sistema. Com Docker instalado, `pnpm test:visual` baixa a imagem na primeira vez e faz o resto. Sem Docker, nada quebra: no `pnpm test` esses testes aparecem como pulados, com o aviso "regressão visual roda no Docker".
+A regressão visual roda dentro da imagem oficial do Playwright, porque as capturas mudam com as fontes e a renderização de cada sistema. Com Docker instalado, `pnpm test:visual` baixa a imagem na primeira vez e faz o resto. Sem Docker, nada quebra: no `pnpm test` esses testes aparecem como pulados, com o aviso "regressão visual roda no Docker". As baselines também podem ser conferidas ou regravadas pelo workflow manual "Baselines visuais" do GitHub Actions (mesma imagem): o modo `atualizar` publica as capturas novas como artifact, para conferir e commitar à mão.
 
 Para o Lighthouse no Linux é preciso ter o Chrome instalado. O script procura em `/usr/bin/google-chrome-stable`; se estiver em outro lugar, defina `CHROME_PATH`.
 
