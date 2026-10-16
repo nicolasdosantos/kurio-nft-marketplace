@@ -187,9 +187,7 @@ function StripItem({ item, active }: { item: NavItem; active: boolean }) {
     </>
   )
   if (!item.to) {
-    return (
-      <ComingSoon className={cn(base, 'border-border text-text-secondary')}>{content}</ComingSoon>
-    )
+    return <ComingSoon className={cn(base, 'border-border text-text-accent')}>{content}</ComingSoon>
   }
   return (
     <Link

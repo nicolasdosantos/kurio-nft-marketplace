@@ -1,4 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router'
+import { Lock } from 'lucide-react'
 import { useCartCount } from '@/api/cart'
 import { useSession } from '@/session/session-store'
 import { useBumpKey } from '@/lib/use-bump-key'
@@ -36,10 +37,10 @@ export function MobileTabBar() {
 
       <button
         type="button"
-        disabled
-        title="Leitor de NFT em breve"
+        // Mesmo padrão dos outros itens "em breve": focável, com tooltip, e o clique não faz nada.
+        aria-disabled="true"
         aria-label="Ler código de NFT (em breve)"
-        className="absolute top-0 left-1/2 size-[65px] -translate-x-1/2 cursor-not-allowed"
+        className="group/soon absolute top-0 left-1/2 size-[65px] -translate-x-1/2 cursor-not-allowed"
       >
         <img src="/icons/tabbar-center.svg" alt="" className="absolute inset-0 size-full" />
         {scanIconPieces.map((piece) => (
@@ -51,6 +52,17 @@ export function MobileTabBar() {
             className="absolute max-w-none"
           />
         ))}
+        <Lock
+          aria-hidden="true"
+          className="absolute top-2 right-2 size-3 text-ink"
+          strokeWidth={2.5}
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-full left-1/2 mt-1.5 hidden -translate-x-1/2 rounded-[4px] border border-border-soft bg-surface-dark px-2 py-1 text-caption-sm leading-4 font-medium whitespace-nowrap text-text-primary group-hover/soon:block group-focus/soon:block"
+        >
+          Em breve
+        </span>
       </button>
 
       <Link

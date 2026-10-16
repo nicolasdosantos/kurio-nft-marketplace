@@ -93,21 +93,22 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <label htmlFor="newsletter-email" className="sr-only">
               E-mail para novidades (em breve)
             </label>
-            <input
-              id="newsletter-email"
-              type="email"
-              disabled
-              placeholder="digite seu e-mail..."
-              className="min-w-0 flex-1 bg-transparent text-body-sm text-secondary placeholder:text-secondary disabled:cursor-not-allowed"
-            />
-            <button
-              type="submit"
-              disabled
-              title="Em breve"
-              className="h-10 w-[85px] rounded-r-[6px] bg-primary pr-1 pl-4 text-body-lg font-bold text-ink disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Enviar
-            </button>
+            <ComingSoon showLock={false} className="flex h-10 min-w-0 flex-1 items-center gap-0">
+              <input
+                id="newsletter-email"
+                type="email"
+                disabled
+                placeholder="digite seu e-mail..."
+                className="min-w-0 flex-1 bg-transparent text-body-sm text-secondary placeholder:text-secondary disabled:cursor-not-allowed"
+              />
+              <button
+                type="submit"
+                disabled
+                className="h-10 w-[85px] rounded-r-[6px] bg-primary pr-1 pl-4 text-body-lg font-bold text-ink disabled:cursor-not-allowed"
+              >
+                Enviar
+              </button>
+            </ComingSoon>
           </form>
           <p className="text-caption leading-[22px] text-text-secondary">
             Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
@@ -145,7 +146,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <ul className="text-body-sm leading-[30px] text-foreground">
               {column.links.map((label) => (
                 <li key={label}>
-                  <ComingSoon>{label}</ComingSoon>
+                  <ComingSoon showLock={false}>{label}</ComingSoon>
                 </li>
               ))}
             </ul>
@@ -157,7 +158,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <ul className="flex gap-2.5">
               {socialNetworks.map((network) => (
                 <li key={network.name}>
-                  <ComingSoon className="block">
+                  <ComingSoon showLock={false} className="block">
                     <img
                       src={network.icon}
                       alt={network.name}
