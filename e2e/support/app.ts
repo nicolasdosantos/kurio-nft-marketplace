@@ -135,6 +135,18 @@ export async function expectFocusVisible(page: Page) {
 // janela também precisa continuar a do aparelho: conteúdo largo demais faz o navegador
 // reduzir a página inteira, e o innerWidth cresce.
 export async function expectNoHorizontalScroll(page: Page, width: number, screen: string) {
+  try {
+    await measureHorizontalScroll(page, width, screen)
+  } catch (error) {
+    // Com muitas navegações seguidas e a máquina carregada, o Chromium às vezes ainda troca
+    // de documento depois do goto. Espera carregar e mede de novo, uma vez.
+    if (!String(error).includes('Execution context was destroyed')) throw error
+    await page.waitForLoadState()
+    await measureHorizontalScroll(page, width, screen)
+  }
+}
+
+async function measureHorizontalScroll(page: Page, width: number, screen: string) {
   const sizes = await page.evaluate(() => ({
     scroll: document.documentElement.scrollWidth,
     inner: window.innerWidth,
