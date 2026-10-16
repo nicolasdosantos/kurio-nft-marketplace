@@ -6,11 +6,13 @@ Não tem backend. A API REST, o login e o tempo real (Socket.IO) são simulados 
 
 Demo: https://kurio-nft-marketplace-eta.vercel.app (o deploy roda com os mocks ligados).
 
-Como o projeto está organizado, os contratos da API e as decisões que tomei estão no [ARCHITECTURE.md](./ARCHITECTURE.md).
+Como o projeto está organizado, os contratos da API, as animações e as decisões que tomei estão no [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Stack
 
 React 19 e TypeScript com Vite, TanStack Router e TanStack Query, Axios e `socket.io-client`, Tailwind CSS 4 com os componentes do shadcn/ui, react-hook-form e zod, MSW 2 com `@mswjs/socket.io-binding`, Playwright e Lighthouse.
+
+As animações são só CSS (Tailwind e `tw-animate-css`), mexem apenas em `transform` e `opacity` e ficam desligadas para quem usa `prefers-reduced-motion`.
 
 ## Rodando do zero
 

@@ -188,4 +188,4 @@ As telas seguem o Figma. Abaixo estão só os pontos em que a implementação fi
 ### Adaptações para o celular
 
 13. Telas sem versão de celular no Figma (comprovante, perfil e carteiras) viraram páginas inteiras no mesmo padrão do carrinho e do pagamento. O menu da conta vira uma faixa de abas com rolagem horizontal, e login e cadastro, que são modais no desktop, viram páginas.
-14. No celular, o detalhe e o carrinho trocam a tab bar pela barra de compra, a ordenação do catálogo fica dentro dos filtros, e o pagamento mostra também os itens, o resumo e os dados do comprador, que o Figma deixa de fora nessa tela.
+14. No celular, o detalhe e o carrinho trocam a tab bar pela barra de compra, a ordenação do catálogo fica dentro dos filtros, e o pagamento mostra também os itens, o resumo e os dados do comprador, que o Figma deixa de fora nessa tela. O rodapé, que não aparece nos frames de celular, fica no fim de todas as páginas, e os botões das telas sem versão de celular usam o formato de pílula das outras telas mobile do Figma.
