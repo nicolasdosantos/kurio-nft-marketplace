@@ -121,7 +121,12 @@ export async function expectFocusVisible(page: Page) {
     const isHiddenInput =
       element instanceof HTMLInputElement && ['radio', 'checkbox'].includes(element.type)
     const target = isHiddenInput ? element.nextElementSibling : element
-    return target ? getComputedStyle(target).outlineStyle : 'none'
+    if (!target) return 'none'
+    // Nos campos de login e cadastro o anel fica no contorno, o elemento pai do input.
+    const own = getComputedStyle(target).outlineStyle
+    return own !== 'none' || !target.parentElement
+      ? own
+      : getComputedStyle(target.parentElement).outlineStyle
   })
   expect(outline).not.toBe('none')
 }
