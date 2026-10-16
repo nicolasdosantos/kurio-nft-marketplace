@@ -137,9 +137,13 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
         )}
 
         <section
-          aria-label="Catálogo de NFTs"
+          aria-labelledby="catalog-title"
           className="flex min-w-0 flex-1 flex-col gap-4 md:gap-8"
         >
+          {/* Título da seção para leitor de tela: os cards são h3 e precisam de um h2 antes. */}
+          <h2 id="catalog-title" className="sr-only">
+            Catálogo de NFTs
+          </h2>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <CatalogTabs search={search} onFiltersChange={onFiltersChange} />
             {isTabletUp && (
