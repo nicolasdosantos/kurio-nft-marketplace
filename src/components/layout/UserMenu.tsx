@@ -20,7 +20,8 @@ export function UserMenu() {
   if (!session.user) return null
 
   return (
-    <DropdownMenu>
+    // Sem modal: um menu não precisa esconder o resto da página com aria-hidden.
+    <DropdownMenu modal={false}>
       <DropdownMenuTrigger
         data-testid="current-user"
         className="flex h-[35px] items-center gap-2 rounded-[6px] border border-primary px-3 text-body-md font-medium text-foreground"

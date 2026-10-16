@@ -150,14 +150,15 @@ export function CartSummary({
                 <dd className={style.value}>{row.value}</dd>
               </div>
             ))}
-            <div className="flex flex-col items-end">
-              <div className="flex w-full items-center justify-between gap-4">
-                <dt>Taxa de rede</dt>
-                <dd className={style.value}>{quote.networkFeeEth} ETH</dd>
-              </div>
-              <span className="text-caption-sm leading-4 text-text-accent">
-                Taxa estimada (Ethereum)
-              </span>
+            {/* A "Taxa estimada" fica dentro do dd: num <dl> só cabem dt e dd. */}
+            <div className="flex items-start justify-between gap-4">
+              <dt>Taxa de rede</dt>
+              <dd className="flex flex-col items-end">
+                <span className={cn(style.value, 'leading-5')}>{quote.networkFeeEth} ETH</span>
+                <span className="text-caption-sm leading-4 text-text-accent">
+                  Taxa estimada (Ethereum)
+                </span>
+              </dd>
             </div>
             <div className="mt-3 flex items-center justify-between gap-4">
               <dt className="text-body-md leading-4 font-bold">Total</dt>

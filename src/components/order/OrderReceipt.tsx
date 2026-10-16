@@ -102,18 +102,20 @@ export function OrderReceipt({ order, variant, titleAs: Title }: OrderReceiptPro
         )}
       >
         {meta.map((item, index) => (
-          <div key={item.label} className="flex items-center">
-            {isDesktop && index > 0 && (
-              <span aria-hidden="true" className="mr-[17px] h-[31px] w-px bg-primary" />
+          // O divisor do Figma é um pseudo-elemento: dentro do <dl> só cabem dt e dd.
+          <div
+            key={item.label}
+            className={cn(
+              'relative flex flex-col',
+              isDesktop &&
+                index > 0 &&
+                'pl-[18px] before:absolute before:top-1/2 before:left-0 before:h-[31px] before:w-px before:-translate-y-1/2 before:bg-primary',
             )}
-            <div className="flex flex-col">
-              <dt className={cn('text-body-sm leading-4', item.bold && 'font-bold')}>
-                {item.label}
-              </dt>
-              <dd data-testid={item.testId} className="text-body leading-5">
-                {item.value}
-              </dd>
-            </div>
+          >
+            <dt className={cn('text-body-sm leading-4', item.bold && 'font-bold')}>{item.label}</dt>
+            <dd data-testid={item.testId} className="text-body leading-5">
+              {item.value}
+            </dd>
           </div>
         ))}
       </dl>

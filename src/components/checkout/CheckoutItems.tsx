@@ -107,50 +107,55 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
         )}
       </p>
 
-      <dl
+      {/* Dois <dl>: a "Taxa estimada" e a linha divisória não podem ficar dentro de um. */}
+      <div
         data-testid="checkout-summary"
         aria-busy={updating}
         className={cn('flex flex-col gap-3 text-body leading-5', updating && 'opacity-60')}
       >
         {quote ? (
           <>
-            <div className="flex items-center justify-between gap-4">
-              <dt>Subtotal</dt>
-              <dd className="text-body-lg leading-4">{quote.subtotalEth} ETH</dd>
-            </div>
-            <div className="flex items-center justify-between gap-4">
-              <dt>
-                {quote.coupon ? `Desconto do cupom (${quote.coupon.percentOff}%)` : 'Desconto'}
-              </dt>
-              <dd>(-) {quote.discountEth} ETH</dd>
-            </div>
-            <div className="flex flex-col gap-3">
+            <dl className="flex flex-col gap-3">
+              <div className="flex items-center justify-between gap-4">
+                <dt>Subtotal</dt>
+                <dd className="text-body-lg leading-4">{quote.subtotalEth} ETH</dd>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <dt>
+                  {quote.coupon ? `Desconto do cupom (${quote.coupon.percentOff}%)` : 'Desconto'}
+                </dt>
+                <dd>(-) {quote.discountEth} ETH</dd>
+              </div>
               <div className="flex items-center justify-between gap-4">
                 <dt>Taxa de rede</dt>
                 <dd data-testid="checkout-fee" className="text-body-lg leading-4">
                   {quote.networkFeeEth} ETH
                 </dd>
               </div>
-              <span className="text-center text-caption-sm leading-4 text-text-accent">
-                Taxa estimada ({networkLabels[quote.network]})
-              </span>
-            </div>
+            </dl>
+            <p className="text-center text-caption-sm leading-4 text-text-accent">
+              Taxa estimada ({networkLabels[quote.network]})
+            </p>
             <div className="h-px bg-primary/30" />
-            {/* Desktop: linha com recuo de 42px; mobile: "Total:" à direita, como no Figma. */}
-            <div
-              className={cn(
-                'flex items-center gap-4',
-                isDesktop ? 'justify-between lg:px-[42px]' : 'justify-end gap-7',
-              )}
-            >
-              <dt className="text-body-md leading-4 font-bold">{isDesktop ? 'Total' : 'Total:'}</dt>
-              <dd
-                data-testid="checkout-total"
-                className="text-body-lg leading-4 font-bold text-text-accent"
+            <dl>
+              {/* Desktop: linha com recuo de 42px; mobile: "Total:" à direita, como no Figma. */}
+              <div
+                className={cn(
+                  'flex items-center gap-4',
+                  isDesktop ? 'justify-between lg:px-[42px]' : 'justify-end gap-7',
+                )}
               >
-                {quote.totalEth} ETH
-              </dd>
-            </div>
+                <dt className="text-body-md leading-4 font-bold">
+                  {isDesktop ? 'Total' : 'Total:'}
+                </dt>
+                <dd
+                  data-testid="checkout-total"
+                  className="text-body-lg leading-4 font-bold text-text-accent"
+                >
+                  {quote.totalEth} ETH
+                </dd>
+              </div>
+            </dl>
           </>
         ) : (
           <>
@@ -160,7 +165,7 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
             <Skeleton className="h-4" />
           </>
         )}
-      </dl>
+      </div>
     </section>
   )
 }

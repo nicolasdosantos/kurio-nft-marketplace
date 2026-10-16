@@ -114,6 +114,11 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-text-accent;
   }
+  /* O fieldset nasce com min-inline-size: min-content e não encolhe abaixo do conteúdo
+     (os cards de carteira passavam da margem em 320px). */
+  fieldset {
+    min-inline-size: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
