@@ -19,6 +19,7 @@ import { networkLabels } from '@/lib/display'
 import { useMediaQuery } from '@/lib/use-media-query'
 import { cn } from '@/lib/utils'
 import { useSession } from '@/session/session-store'
+import { useBumpKey } from '@/lib/use-bump-key'
 
 export function NftDetailPage({ nftId }: { nftId: string }) {
   const nftQuery = useNft(nftId)
@@ -26,7 +27,11 @@ export function NftDetailPage({ nftId }: { nftId: string }) {
 
   if (nftQuery.isPending) {
     return (
-      <main className={isTabletUp ? 'mx-auto w-full max-w-[1232px] px-4 pt-8' : undefined}>
+      <main
+        className={
+          isTabletUp ? 'mx-auto w-full max-w-[1232px] px-4 pt-[41px] md:pt-[33px]' : undefined
+        }
+      >
         <h1 className="sr-only">Carregando NFT</h1>
         <NftDetailSkeleton isTabletUp={isTabletUp} />
       </main>
@@ -72,6 +77,7 @@ function NftDetailContent({ nft, isTabletUp }: { nft: Nft; isTabletUp: boolean }
   const toggleFavorite = useToggleFavorite()
   const addToCart = useAddToCart()
   const cartCount = useCartCount()
+  const cartBump = useBumpKey(cartCount)
 
   const [editionId, setEditionId] = useState<EditionId | null>(
     () => nft.editions.find((edition) => edition.stock > 0)?.id ?? null,
@@ -320,7 +326,13 @@ function NftDetailContent({ nft, isTabletUp }: { nft: Nft; isTabletUp: boolean }
             >
               <img src="/icons/cart-shop.svg" alt="" width={20} height={20} />
               {cartCount > 0 && (
-                <span className="absolute top-2 right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink">
+                <span
+                  key={cartBump}
+                  className={cn(
+                    'absolute top-2 right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink',
+                    cartBump > 0 && 'animate-bump',
+                  )}
+                >
                   <span data-testid="cart-count">{cartCount}</span>
                 </span>
               )}
@@ -332,15 +344,15 @@ function NftDetailContent({ nft, isTabletUp }: { nft: Nft; isTabletUp: boolean }
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-8">
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px] md:pt-[33px]">
       <div className="flex flex-col gap-3">
         <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
           <Link to="/" className="hover:underline">
             Início
           </Link>{' '}
           /{' '}
-          <Link to="/" search={{ collections: [nft.collection.slug] }} className="hover:underline">
-            {nft.collection.name}
+          <Link to="/" hash="catalogo" className="hover:underline">
+            Mercado
           </Link>
         </nav>
 

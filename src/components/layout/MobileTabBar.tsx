@@ -1,6 +1,8 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { useCartCount } from '@/api/cart'
 import { useSession } from '@/session/session-store'
+import { useBumpKey } from '@/lib/use-bump-key'
+import { cn } from '@/lib/utils'
 
 // Ícones laterais posicionados em % da largura, para a barra acompanhar telas menores;
 // as peças do ícone central são relativas ao círculo.
@@ -17,6 +19,7 @@ const sideIconClasses = 'absolute top-[71px] grid size-5 place-items-center'
 export function MobileTabBar() {
   const session = useSession()
   const cartCount = useCartCount()
+  const cartBump = useBumpKey(cartCount)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const accountPath = session.user ? '/perfil' : '/login'
 
@@ -33,10 +36,10 @@ export function MobileTabBar() {
 
       <button
         type="button"
-        disabled
-        title="Leitor de NFT em breve"
+        // Mesmo padrão dos outros itens "em breve": focável, com tooltip, e o clique não faz nada.
+        aria-disabled="true"
         aria-label="Ler código de NFT (em breve)"
-        className="absolute top-0 left-1/2 size-[65px] -translate-x-1/2 cursor-not-allowed"
+        className="group/soon absolute top-0 left-1/2 size-[65px] -translate-x-1/2 cursor-not-allowed"
       >
         <img src="/icons/tabbar-center.svg" alt="" className="absolute inset-0 size-full" />
         {scanIconPieces.map((piece) => (
@@ -48,6 +51,12 @@ export function MobileTabBar() {
             className="absolute max-w-none"
           />
         ))}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute top-full left-1/2 mt-1.5 hidden -translate-x-1/2 rounded-[4px] border border-border-soft bg-surface-dark px-2 py-1 text-caption-sm leading-4 font-medium whitespace-nowrap text-text-primary group-hover/soon:block group-focus/soon:block"
+        >
+          Em breve
+        </span>
       </button>
 
       <Link
@@ -72,7 +81,13 @@ export function MobileTabBar() {
       >
         <img src="/icons/mobile-shop.svg" alt="" width={20} height={20} />
         {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink">
+          <span
+            key={cartBump}
+            className={cn(
+              'absolute -top-2 -right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink',
+              cartBump > 0 && 'animate-bump',
+            )}
+          >
             <span data-testid="cart-count">{cartCount}</span>
           </span>
         )}

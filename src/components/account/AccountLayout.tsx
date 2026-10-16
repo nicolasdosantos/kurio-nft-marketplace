@@ -61,8 +61,8 @@ export function AccountLayout({ section, children }: AccountLayoutProps) {
 
   if (isDesktop) {
     return (
-      // 41px: compensa o header do app, mais baixo que o dos frames (como no Pagamento).
-      <main className="mx-auto grid w-full max-w-[1232px] grid-cols-[310px_minmax(0,1fr)] items-start gap-7 px-4 pt-[41px]">
+      // No desktop, 33px abaixo da linha do header, como nos frames do Figma.
+      <main className="mx-auto grid w-full max-w-[1232px] grid-cols-[310px_minmax(0,1fr)] items-start gap-7 px-4 pt-[41px] md:pt-[33px]">
         <nav
           aria-label="Menu da conta"
           className="flex flex-col bg-surface-card pt-[14px] pb-[7px]"
@@ -102,7 +102,7 @@ export function AccountLayout({ section, children }: AccountLayoutProps) {
     >
       {!isTabletUp && (
         <div className="flex h-11 items-start justify-between gap-4">
-          <p className="pt-[9px] text-[20px] leading-4 font-bold">Meu perfil</p>
+          <p className="pt-[5px] text-[20px] leading-6 font-bold">Meu perfil</p>
           <button
             type="button"
             onClick={logout.leave}
@@ -187,9 +187,7 @@ function StripItem({ item, active }: { item: NavItem; active: boolean }) {
     </>
   )
   if (!item.to) {
-    return (
-      <ComingSoon className={cn(base, 'border-border text-text-secondary')}>{content}</ComingSoon>
-    )
+    return <ComingSoon className={cn(base, 'border-border text-text-accent')}>{content}</ComingSoon>
   }
   return (
     <Link

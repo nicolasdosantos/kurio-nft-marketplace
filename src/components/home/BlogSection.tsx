@@ -1,4 +1,5 @@
 import { ComingSoon } from '@/components/layout/ComingSoon'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 const posts = [
   {
@@ -32,8 +33,13 @@ const posts = [
 ]
 
 export function BlogSection() {
+  const revealRef = useRevealOnScroll<HTMLElement>()
   return (
-    <section aria-labelledby="blog-title" className="hidden flex-col items-center gap-10 md:flex">
+    <section
+      aria-labelledby="blog-title"
+      ref={revealRef}
+      className="hidden flex-col items-center gap-10 md:flex"
+    >
       <header className="flex flex-col gap-3 text-center">
         <h2 id="blog-title" className="text-[28px] font-bold text-text-primary">
           Diário da Cunhagem

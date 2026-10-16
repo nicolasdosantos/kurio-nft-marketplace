@@ -1,4 +1,6 @@
 import { ComingSoon } from './ComingSoon'
+import { cn } from '@/lib/utils'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 const highlights = [
   {
@@ -47,10 +49,22 @@ const socialNetworks = [
   { name: 'YouTube', icon: '/icons/social-youtube.svg' },
 ]
 
-export function SiteFooter() {
+// reserveBottomBar: no celular, deixa espaço para a tab bar ou a barra de compra fixas.
+export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) {
+  const revealRef1 = useRevealOnScroll<HTMLElement>()
+  const revealRef2 = useRevealOnScroll<HTMLElement>()
+  const revealRef3 = useRevealOnScroll<HTMLElement>()
   return (
-    <footer className="mx-auto mt-24 w-full max-w-[1232px] px-4 pb-36 md:pb-6">
-      <section className="grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-4 lg:gap-0 xl:flex xl:h-[250px] xl:items-end">
+    <footer
+      className={cn(
+        'mx-auto mt-24 w-full max-w-[1232px] px-4 md:pb-6',
+        reserveBottomBar ? 'pb-36' : 'pb-8',
+      )}
+    >
+      <section
+        ref={revealRef1}
+        className="grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.5fr)] lg:gap-0 xl:flex xl:h-[250px] xl:items-end"
+      >
         {highlights.map((highlight) => (
           <div
             key={highlight.title}
@@ -79,21 +93,22 @@ export function SiteFooter() {
             <label htmlFor="newsletter-email" className="sr-only">
               E-mail para novidades (em breve)
             </label>
-            <input
-              id="newsletter-email"
-              type="email"
-              disabled
-              placeholder="digite seu e-mail..."
-              className="min-w-0 flex-1 bg-transparent text-body-sm text-secondary placeholder:text-secondary disabled:cursor-not-allowed"
-            />
-            <button
-              type="submit"
-              disabled
-              title="Em breve"
-              className="h-10 w-[85px] rounded-r-[6px] bg-primary pr-1 pl-4 text-body-lg font-bold text-ink disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              Enviar
-            </button>
+            <ComingSoon className="flex h-10 min-w-0 flex-1 items-center">
+              <input
+                id="newsletter-email"
+                type="email"
+                disabled
+                placeholder="digite seu e-mail..."
+                className="min-w-0 flex-1 bg-transparent text-body-sm text-secondary placeholder:text-secondary disabled:cursor-not-allowed"
+              />
+              <button
+                type="submit"
+                disabled
+                className="h-10 w-[85px] rounded-r-[6px] bg-primary pr-1 pl-4 text-body-lg font-bold text-ink disabled:cursor-not-allowed"
+              >
+                Enviar
+              </button>
+            </ComingSoon>
           </form>
           <p className="text-caption leading-[22px] text-text-secondary">
             Receba lançamentos selecionados, histórias de criadores e novidades do mercado.
@@ -103,7 +118,10 @@ export function SiteFooter() {
       </section>
 
       {/* Coluna no celular, 2 colunas no tablet e a linha do Figma a partir de 1024px. */}
-      <section className="flex flex-col gap-4 bg-surface-dark p-8 text-body-sm leading-[22px] text-foreground md:grid md:grid-cols-2 lg:flex lg:h-[88px] lg:flex-row lg:items-center lg:gap-8 xl:gap-[92px]">
+      <section
+        ref={revealRef2}
+        className="flex flex-col gap-4 bg-surface-dark p-8 text-body-sm leading-[22px] text-foreground md:grid md:grid-cols-2 lg:flex lg:h-[88px] lg:flex-row lg:items-center lg:gap-8 xl:gap-[92px]"
+      >
         <span className="flex-1 font-bold tracking-[1.4px]">KURIO</span>
         <p className="flex-1 lg:whitespace-nowrap">
           Feito para colecionadores,
@@ -118,7 +136,10 @@ export function SiteFooter() {
         </a>
       </section>
 
-      <section className="grid gap-8 bg-surface-card p-8 md:grid-cols-2 lg:grid-cols-4 xl:flex xl:gap-[124px]">
+      <section
+        ref={revealRef3}
+        className="grid gap-8 bg-surface-card p-8 md:grid-cols-2 lg:grid-cols-4 xl:flex xl:gap-[124px]"
+      >
         {linkColumns.map((column) => (
           <nav key={column.title} aria-label={column.title} className="flex flex-1 flex-col gap-2">
             <h2 className="text-body-lg font-bold text-foreground">{column.title}</h2>
@@ -152,14 +173,14 @@ export function SiteFooter() {
           </div>
           <div className="flex flex-col gap-3">
             <h2 className="text-body-lg font-bold text-foreground">Carteiras compatíveis</h2>
-            <p className="flex h-[26px] items-center justify-center rounded-[6px] border border-border-soft bg-surface-dark text-tiny-sm font-bold tracking-[0.1px] whitespace-pre text-text-accent">
+            <p className="flex min-h-[26px] items-center justify-center rounded-[6px] border border-border-soft bg-surface-dark px-2 py-1 text-center text-tiny-sm font-bold tracking-[0.1px] text-text-accent xl:h-[26px] xl:px-0 xl:py-0 xl:whitespace-pre">
               {'METAMASK  •  WALLETCONNECT  •  COINBASE'}
             </p>
           </div>
         </div>
       </section>
 
-      <p className="pt-1.5 text-center text-body-sm leading-[30px] text-foreground">
+      <p className="pt-1.5 text-center text-body-sm leading-5 text-foreground md:leading-[30px]">
         © 2026 Kurio. Propriedade digital para todos.
       </p>
     </footer>

@@ -48,8 +48,22 @@ export function UserMenu() {
           <Link to="/carteiras">Carteiras</Link>
         </DropdownMenuItem>
         {comingSoonItems.map((label) => (
-          <DropdownMenuItem key={label} disabled>
-            {label} <span className="ml-auto text-caption-sm">em breve</span>
+          // Não usa `disabled`: o Radix tiraria o item do foco, e o tooltip precisa aparecer no
+          // foco também. preventDefault mantém o menu aberto e não faz nada.
+          <DropdownMenuItem
+            key={label}
+            aria-disabled="true"
+            onSelect={(event) => event.preventDefault()}
+            className="group/soon cursor-not-allowed"
+          >
+            {label}
+            <span className="sr-only"> (em breve)</span>
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-1.5 hidden -translate-y-1/2 rounded-[4px] border border-border-soft bg-surface-dark px-2 py-0.5 text-caption-sm leading-4 font-medium text-text-primary group-hover/soon:block group-focus/soon:block"
+            >
+              Em breve
+            </span>
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />

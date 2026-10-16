@@ -17,6 +17,10 @@ test('skeletons no carregamento lento, sem deslocar o layout', async ({ page }) 
   await expect(firstCard).toBeVisible({ timeout: 10_000 })
   await expect(skeletons).toHaveCount(0)
 
+  // O card entra com uma subida curta (só transform); mede depois que ela termina.
+  await firstCard.evaluate((element) =>
+    Promise.all(element.getAnimations().map((animation) => animation.finished)),
+  )
   // O card ocupa o mesmo espaço do skeleton: nada pula quando os dados chegam.
   const cardBox = await firstCard.boundingBox()
   expect(Math.abs((cardBox?.y ?? 0) - (skeletonBox?.y ?? 0))).toBeLessThanOrEqual(1)

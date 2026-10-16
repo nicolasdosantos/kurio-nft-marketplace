@@ -89,7 +89,7 @@ export function OrderPage({ orderId }: { orderId: string }) {
           >
             <img src="/icons/arrow-left.svg" alt="" width={20} height={20} />
           </Link>
-          <p className="pt-[9px] text-[20px] leading-4 font-bold">Comprovante</p>
+          <p className="pt-[5px] text-[20px] leading-6 font-bold">Comprovante</p>
         </div>
         <div
           aria-label="Recibo"
@@ -107,7 +107,7 @@ export function OrderPage({ orderId }: { orderId: string }) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px]">
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px] md:pt-[33px]">
       <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
         <Link to="/" className="hover:underline">
           Início

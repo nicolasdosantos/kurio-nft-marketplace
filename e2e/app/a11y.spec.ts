@@ -12,6 +12,20 @@ import {
 
 // axe-core em todas as telas e estados principais, desktop e mobile (regras WCAG 2.1 A e AA).
 async function expectNoViolations(page: Page) {
+  // As entradas duram até ~1s em listas: o contraste é medido com o conteúdo já opaco. O
+  // shimmer (infinito) e as animações ligadas à rolagem ficam de fora da espera.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter(
+          (animation) =>
+            animation.timeline instanceof DocumentTimeline &&
+            animation.effect?.getTiming().iterations !== Infinity,
+        )
+        .map((animation) => animation.finished.catch(() => undefined)),
+    ),
+  )
   const results = await new AxeBuilder({ page })
     .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
     .analyze()

@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { CartItem, Quote } from '@/api/contracts/cart'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -37,7 +38,7 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
           data-testid="checkout-items"
           className="flex flex-col gap-3"
         >
-          {quote.lines.map((line) => {
+          {quote.lines.map((line, index) => {
             const cartItem = items.find((item) => item.id === line.itemId)
             if (!cartItem) return null
             const image = nftImageSources(cartItem.imageUrl)
@@ -46,7 +47,8 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
             return (
               <li
                 key={line.itemId}
-                className="flex min-h-[70px] items-center gap-2 bg-surface-card pr-4 pl-1"
+                style={{ '--stagger': index } as CSSProperties}
+                className="rise-in flex min-h-[70px] items-center gap-2 bg-surface-card pr-4 pl-1"
               >
                 <img
                   src={image.src}

@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { CatalogSearch } from '@/lib/catalog-search'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 const promos: { title: string[]; text: string; image: string; search: CatalogSearch }[] = [
   {
@@ -17,12 +18,13 @@ const promos: { title: string[]; text: string; image: string; search: CatalogSea
 ]
 
 export function PromoCards() {
+  const revealRef = useRevealOnScroll<HTMLElement>()
   return (
-    <section aria-label="Promoções" className="hidden gap-7 md:grid md:grid-cols-2">
+    <section aria-label="Promoções" ref={revealRef} className="hidden gap-7 md:grid md:grid-cols-2">
       {promos.map((promo) => (
         <article
           key={promo.title[0]}
-          className="relative flex h-[250px] overflow-hidden rounded-lg bg-surface-card"
+          className="relative flex min-h-[250px] overflow-hidden rounded-lg bg-surface-card xl:h-[250px]"
         >
           <img
             src={promo.image}
@@ -30,7 +32,7 @@ export function PromoCards() {
             width={292}
             height={250}
             loading="lazy"
-            className="h-[250px] w-1/2 max-w-[292px] rounded-[18px] object-cover"
+            className="w-1/2 max-w-[292px] self-stretch rounded-[18px] object-cover xl:h-[250px]"
           />
           <div className="relative flex flex-1 flex-col items-end gap-4 pt-9 pr-4 text-right lg:pr-[30px]">
             <h2 className="text-body-lg leading-6 font-bold text-foreground xl:whitespace-nowrap">

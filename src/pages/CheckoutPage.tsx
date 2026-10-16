@@ -509,11 +509,12 @@ export function CheckoutPage() {
       <form
         noValidate
         onSubmit={form.handleSubmit(confirmPurchase)}
-        className={
+        className={cn(
+          'rise-in',
           isTabletUp
             ? 'grid gap-12 lg:grid-cols-[minmax(0,763px)_405px] lg:justify-between lg:gap-8'
-            : 'flex flex-col gap-4'
-        }
+            : 'flex flex-col gap-4',
+        )}
       >
         {isTabletUp ? (
           <>
@@ -556,7 +557,7 @@ export function CheckoutPage() {
           >
             <img src="/icons/arrow-left.svg" alt="" width={20} height={20} />
           </button>
-          <h1 className="pt-[9px] text-[20px] leading-4 font-bold">Pagamento com carteira</h1>
+          <h1 className="pt-[5px] text-[20px] leading-6 font-bold">Pagamento com carteira</h1>
         </div>
         {content}
       </main>
@@ -564,16 +565,16 @@ export function CheckoutPage() {
   }
 
   return (
-    // 41px em vez de 32px: o header do app é 9px mais baixo que o dos frames do Figma.
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px]">
+    // No desktop, 33px abaixo da linha do header, como nos frames do Figma.
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px] md:pt-[33px]">
       <h1 className="sr-only">Pagamento</h1>
       <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
         <Link to="/" className="hover:underline">
           Início
         </Link>{' '}
         /{' '}
-        <Link to="/carrinho" className="hover:underline">
-          Carrinho
+        <Link to="/" hash="catalogo" className="hover:underline">
+          Mercado
         </Link>{' '}
         / <span aria-current="page">Pagamento</span>
       </nav>

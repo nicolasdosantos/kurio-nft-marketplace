@@ -56,7 +56,7 @@ export function WalletStatus({
 }: WalletStatusProps) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <h2 data-testid="wallet-status" className="text-body-md leading-4 font-bold">
+      <h2 data-testid="wallet-status" className="text-body-md leading-5 font-bold">
         {connected ? 'Carteira conectada' : 'Carteira desconectada'}
       </h2>
       {connected ? (
@@ -166,7 +166,7 @@ function WalletCard({
             <span className="text-body-md leading-4 font-bold text-foreground">{label}</span>
             <span className="text-body-sm leading-[22px] text-text-secondary">
               <span className="block truncate">{wallet.ensName || shortHex(wallet.address)}</span>
-              <span className="block truncate">{networkDescriptions[wallet.network]}</span>
+              <span className="block">{networkDescriptions[wallet.network]}</span>
             </span>
           </span>
         </span>

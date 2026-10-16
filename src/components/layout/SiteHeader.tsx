@@ -4,6 +4,8 @@ import { useCartCount } from '@/api/cart'
 import { Input } from '@/components/ui/input'
 import { useSession } from '@/session/session-store'
 import { ComingSoon } from './ComingSoon'
+import { useBumpKey } from '@/lib/use-bump-key'
+import { cn } from '@/lib/utils'
 
 // O menu da conta (DropdownMenu do Radix) só é baixado para quem está logado.
 const UserMenu = lazy(() => import('./UserMenu').then((module) => ({ default: module.UserMenu })))
@@ -50,15 +52,20 @@ function HeaderSearch({ onDone }: { onDone: () => void }) {
 export function SiteHeader() {
   const session = useSession()
   const cartCount = useCartCount()
+  const cartBump = useBumpKey(cartCount)
   const [searchOpen, setSearchOpen] = useState(false)
-  const isHome = useRouterState({ select: (state) => state.location.pathname === '/' })
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const isHome = pathname === '/'
+  // Como no Figma: Início ativo na home e na conta; Mercado no fluxo de compra.
+  const isMarket = /^\/(nft|carrinho|pagamento|pedidos)(\/|$)/.test(pathname)
 
   return (
     <header className="mx-auto hidden w-full max-w-[1232px] px-4 pt-6 md:block">
-      <div className="flex items-start justify-between">
+      {/* Grade de 3 colunas: o menu fica no centro, seja qual for a largura do botão da direita. */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-start">
         <Link
           to="/"
-          className="pt-2 text-body-sm font-bold tracking-[1.4px] text-foreground lg:w-40"
+          className="justify-self-start pt-2 text-body-sm font-bold tracking-[1.4px] text-foreground lg:w-40"
         >
           KURIO
         </Link>
@@ -67,17 +74,32 @@ export function SiteHeader() {
           <Link
             to="/"
             aria-current={isHome ? 'page' : undefined}
-            className="flex w-[58px] flex-col gap-6 text-foreground aria-[current=page]:font-bold aria-[current=page]:text-text-accent"
+            className={cn(
+              'flex w-[58px] flex-col gap-6',
+              isMarket ? 'text-foreground' : 'font-bold text-text-accent',
+            )}
           >
             Início
-            {isHome && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
+            {!isMarket && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
           </Link>
-          <ComingSoon className="text-foreground">Mercado</ComingSoon>
-          <ComingSoon className="text-foreground">Criadores</ComingSoon>
-          <ComingSoon className="text-foreground">Aprenda</ComingSoon>
+          <Link
+            to="/"
+            hash="catalogo"
+            // Já na home, mantém busca e filtros; de outra tela, abre o catálogo completo.
+            search={isHome ? true : undefined}
+            className={cn(
+              'flex flex-col gap-6',
+              isMarket ? 'font-bold text-text-accent' : 'text-foreground',
+            )}
+          >
+            Mercado
+            {isMarket && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
+          </Link>
+          <ComingSoon className="self-start text-foreground">Criadores</ComingSoon>
+          <ComingSoon className="self-start text-foreground">Aprenda</ComingSoon>
         </nav>
 
-        <div className="flex items-center gap-5 lg:gap-7">
+        <div className="flex items-center gap-5 justify-self-end lg:gap-7">
           <button
             type="button"
             aria-label="Abrir busca"
@@ -95,9 +117,17 @@ export function SiteHeader() {
             className="relative grid size-6 place-items-start rounded-sm"
           >
             <img src="/icons/cart.svg" alt="" width={24} height={24} />
-            <span className="absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink">
-              <span data-testid="cart-count">{cartCount}</span>
-            </span>
+            {cartCount > 0 && (
+              <span
+                key={cartBump}
+                className={cn(
+                  'absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink',
+                  cartBump > 0 && 'animate-bump',
+                )}
+              >
+                <span data-testid="cart-count">{cartCount}</span>
+              </span>
+            )}
           </Link>
 
           {session.restoring ? (

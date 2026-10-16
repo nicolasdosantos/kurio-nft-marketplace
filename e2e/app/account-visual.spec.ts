@@ -5,6 +5,11 @@ import { callApi, login, startCleanMockServer } from '../support/mock-api'
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
+// Capturas estáveis: com movimento reduzido as entradas e as animações de rolagem ficam desligadas.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
 async function openAs(page: Page, token: string, path: string) {
   await page.evaluate((value) => localStorage.setItem('kurio:token', value), token)
   await page.goto(path)

@@ -1,4 +1,4 @@
-import { lazy, Suspense, useRef, useState, type FormEvent } from 'react'
+import { lazy, Suspense, useRef, useState, type FormEvent, type CSSProperties } from 'react'
 import { useNftList } from '@/api/catalog'
 import { CatalogPagination } from '@/components/catalog/CatalogPagination'
 import { CatalogTabs, SortSelectPlaceholder } from '@/components/catalog/CatalogToolbar'
@@ -211,8 +211,12 @@ export function HomePage({ search, onFiltersChange }: HomePageProps) {
                 aria-busy={listQuery.isFetching}
                 className="grid grid-cols-2 gap-x-4 gap-y-6 pb-8 md:grid-cols-3 md:gap-x-[34px] md:gap-y-[72px] md:pb-0"
               >
-                {listQuery.data.items.map((nft) => (
-                  <li key={nft.id} className="even:translate-y-8 md:even:translate-y-0">
+                {listQuery.data.items.map((nft, index) => (
+                  <li
+                    key={nft.id}
+                    style={{ '--stagger': index } as CSSProperties}
+                    className="rise-in even:translate-y-8 md:even:translate-y-0"
+                  >
                     <NftCard nft={nft} />
                   </li>
                 ))}

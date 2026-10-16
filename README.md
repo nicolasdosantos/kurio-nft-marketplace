@@ -6,11 +6,13 @@ Não tem backend. A API REST, o login e o tempo real (Socket.IO) são simulados 
 
 Demo: https://kurio-nft-marketplace-eta.vercel.app (o deploy roda com os mocks ligados).
 
-Como o projeto está organizado, os contratos da API e as decisões que tomei estão no [ARCHITECTURE.md](./ARCHITECTURE.md).
+Como o projeto está organizado, os contratos da API, as animações e as decisões que tomei estão no [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ## Stack
 
 React 19 e TypeScript com Vite, TanStack Router e TanStack Query, Axios e `socket.io-client`, Tailwind CSS 4 com os componentes do shadcn/ui, react-hook-form e zod, MSW 2 com `@mswjs/socket.io-binding`, Playwright e Lighthouse.
+
+As animações são só CSS (Tailwind e `tw-animate-css`), mexem apenas em `transform` e `opacity` e ficam desligadas para quem usa `prefers-reduced-motion`.
 
 ## Rodando do zero
 
@@ -27,7 +29,7 @@ pnpm exec playwright install chromium
 pnpm dev                         # http://localhost:5173
 ```
 
-A regressão visual roda dentro da imagem oficial do Playwright, porque as capturas mudam com as fontes e a renderização de cada sistema. Com Docker instalado, `pnpm test:visual` baixa a imagem na primeira vez e faz o resto. Sem Docker, nada quebra: no `pnpm test` esses testes aparecem como pulados, com o aviso "regressão visual roda no Docker".
+A regressão visual roda dentro da imagem oficial do Playwright, porque as capturas mudam com as fontes e a renderização de cada sistema. Com Docker instalado, `pnpm test:visual` baixa a imagem na primeira vez e faz o resto. Sem Docker, nada quebra: no `pnpm test` esses testes aparecem como pulados, com o aviso "regressão visual roda no Docker". As baselines também podem ser conferidas ou regravadas pelo workflow manual "Baselines visuais" do GitHub Actions (mesma imagem): o modo `atualizar` publica as capturas novas como artifact, para conferir e commitar à mão.
 
 Para o Lighthouse no Linux é preciso ter o Chrome instalado. O script procura em `/usr/bin/google-chrome-stable`; se estiver em outro lugar, defina `CHROME_PATH`.
 

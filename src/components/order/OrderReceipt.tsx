@@ -47,7 +47,7 @@ export function OrderReceipt({ order, variant, titleAs: Title }: OrderReceiptPro
   const meta = [
     {
       label: 'ID da transação',
-      value: shortHex(receipt.transactionHash),
+      value: shortHex(`0x${receipt.transactionHash.slice(2).toUpperCase()}`),
       bold: true,
       testId: 'receipt-hash-short',
     },
@@ -61,7 +61,7 @@ export function OrderReceipt({ order, variant, titleAs: Title }: OrderReceiptPro
   ]
 
   return (
-    <div className="flex flex-col text-text-secondary">
+    <div className="rise-in flex flex-col text-text-secondary">
       <header className="flex flex-col items-center gap-4 px-6 pt-[22px] pb-[22px] text-center">
         <div className="grid size-20 place-items-center text-primary">
           {status === 'confirmed' && <ThankYouIcon />}
@@ -75,7 +75,7 @@ export function OrderReceipt({ order, variant, titleAs: Title }: OrderReceiptPro
         <Title
           data-testid="order-status"
           className={cn(
-            'text-body-md leading-4 font-bold',
+            'text-body-md leading-6 font-bold',
             status === 'declined' ? 'text-destructive' : 'text-text-secondary',
           )}
         >

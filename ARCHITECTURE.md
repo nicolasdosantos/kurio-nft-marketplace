@@ -132,7 +132,13 @@ Para os testes de tempo uso o `page.clock`: o relógio continua andando e o `set
 
 A regressão visual cobre Início, Detalhe, Carrinho, Pagamento, Login, Cadastro, Comprovante, Perfil e Carteiras, no desktop e no celular. As baselines ficam no repositório e são geradas e comparadas sempre dentro do Docker, com dados fixos e com máscara no que muda a cada execução, como o hash e a data do pedido.
 
-Em acessibilidade, o axe roda em 23 estados por tamanho de tela (carregando, erro, vazio, preenchido e com diálogos abertos), uma compra inteira é feita só pelo teclado, o foco dos diálogos é conferido, o `prefers-reduced-motion` é testado e nenhuma tela tem rolagem horizontal em 320, 390, 768 e 1440 px. Nas falhas, o Playwright guarda trace e captura, e o relatório HTML fica disponível.
+Em acessibilidade, o axe roda em 23 estados por tamanho de tela (carregando, erro, vazio, preenchido e com diálogos abertos), uma compra inteira é feita só pelo teclado, o foco dos diálogos é conferido, o `prefers-reduced-motion` é testado e nenhuma tela tem rolagem horizontal em 320, 390, 768 e 1440 px. No desktop, todas as telas (como visitante e logado) passam por 1024, 1152, 1280, 1366, 1440, 1536, 1600, 1920 e 2560 px, sem rolagem horizontal e sem sobreposição entre navegação, busca, carrinho e Entrar/menu no header; os modais de login, cadastro e comprovante cabem ou rolam por dentro em janelas baixas (1366×600, 1280×650, 1920×800) e altas (1440×1200). Nas falhas, o Playwright guarda trace e captura, e o relatório HTML fica disponível.
+
+## Animações
+
+As animações existem para o site não parecer estático, sem chamar atenção. O conteúdo que chega depois do skeleton entra com um fade e uma subida de 12px, e nas listas (catálogo, carrossel, carrinho, itens do pagamento) os itens entram um depois do outro, com 50 ms de diferença. As seções abaixo da dobra, como promoções, blog, carrosséis, abas do detalhe e o rodapé, começam invisíveis e entram quando aparecem na tela; o que já está visível quando a página carrega não anima. Tem ainda a elevação com brilho e zoom da imagem no hover dos cards, o "pulo" do coração com um anel ao favoritar, o pulinho do contador do carrinho quando um item entra, o sublinhado que desliza entre as abas do catálogo, uma reação leve dos botões ao clique e um fade curto na troca de página.
+
+Tudo anima só `transform` e `opacity`, que não mudam o layout, por isso o CLS continua em 0. As imagens principais (o hero do Início e a imagem do Detalhe) nunca animam a entrada, porque são o LCP e precisam aparecer na hora; pelo mesmo motivo o fade de troca de página só roda a partir da primeira navegação dentro do app. Com `prefers-reduced-motion` ligado nada se mexe, e os testes visuais rodam nesse modo para as capturas ficarem estáveis.
 
 ## Performance
 
@@ -149,7 +155,7 @@ Outras limitações:
 - O banco simulado fica no `localStorage` e cada aba tem a sua cópia em memória; duas abas abertas podem divergir até o refresh.
 - A API de controle existe também no deploy, porque o deploy é a demonstração.
 - O hash da transação é fictício. O recibo deixa isso claro com o aviso "Transação simulada" no lugar do link do Etherscan.
-- Itens fora do escopo aparecem desabilitados com "em breve".
+- Itens fora do escopo têm a aparência normal e mostram o tooltip "Em breve" no hover, no foco e no toque; clicar não faz nada, e o leitor de tela ouve "(em breve)" com `aria-disabled`.
 
 ## Desvios do Figma
 
@@ -157,7 +163,7 @@ As telas seguem o Figma. Abaixo estão só os pontos em que a implementação fi
 
 ### Escopo do enunciado
 
-1. Tudo que o enunciado não pede aparece desabilitado com "em breve": Mercado, Criadores, Aprenda, newsletter e links do rodapé, blog, login social, "Esqueceu a senha?", código de indicação, o leitor de NFT da tab bar e os itens Atividade, Lista de interesse, Ofertas, Arquivos baixados e Suporte do menu da conta.
+1. Tudo que o enunciado não pede fica com a aparência normal e o tooltip "Em breve": Criadores, Aprenda, newsletter e links do rodapé, blog, login social, "Esqueceu a senha?", código de indicação, o leitor de NFT da tab bar e os itens Atividade, Lista de interesse, Ofertas, Arquivos baixados e Suporte do menu da conta. O Mercado não é uma página própria: leva à grade de NFTs do Início (`/#catalogo`), mantendo a busca e os filtros da URL quando já se está lá, e fica ativo no header do detalhe, do carrinho, do pagamento e do comprovante, como no Figma.
 2. O card do catálogo no desktop mostra o coração de favoritar e a rede, que o Figma não tem, porque o enunciado pede.
 3. Os formulários seguem os contratos da API. O pagamento pede só os dados do pedido (nome de exibição, usuário, e-mail e observação), e os dados da carteira aparecem nos cards Principal e Reserva. O formulário de carteiras tem só os campos de carteira. O perfil tem um botão para os dados e outro para a senha, porque são operações separadas.
 4. O comprovante mostra subtotal e desconto além de taxa e total, e no lugar de "Ver no Etherscan" tem o aviso de transação simulada, porque o hash não existe em nenhum explorer.
@@ -182,4 +188,4 @@ As telas seguem o Figma. Abaixo estão só os pontos em que a implementação fi
 ### Adaptações para o celular
 
 13. Telas sem versão de celular no Figma (comprovante, perfil e carteiras) viraram páginas inteiras no mesmo padrão do carrinho e do pagamento. O menu da conta vira uma faixa de abas com rolagem horizontal, e login e cadastro, que são modais no desktop, viram páginas.
-14. No celular, o detalhe e o carrinho trocam a tab bar pela barra de compra, a ordenação do catálogo fica dentro dos filtros, e o pagamento mostra também os itens, o resumo e os dados do comprador, que o Figma deixa de fora nessa tela.
+14. No celular, o detalhe e o carrinho trocam a tab bar pela barra de compra, a ordenação do catálogo fica dentro dos filtros, e o pagamento mostra também os itens, o resumo e os dados do comprador, que o Figma deixa de fora nessa tela. O rodapé, que não aparece nos frames de celular, fica no fim de todas as páginas, e os botões das telas sem versão de celular usam o formato de pílula das outras telas mobile do Figma.

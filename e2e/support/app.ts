@@ -82,10 +82,10 @@ export async function logoutThroughUi(page: Page) {
   await waitForApiIdle()
 }
 
-// No mobile o badge some quando o carrinho está vazio.
+// Com o carrinho vazio o contador some (no header e na tab bar).
 export async function expectCartCount(page: Page, count: number) {
   const visibleBadge = page.getByTestId('cart-count').filter({ visible: true })
-  if (count === 0 && !isDesktopLayout(page)) {
+  if (count === 0) {
     await expect(visibleBadge).toHaveCount(0)
   } else {
     await expect(visibleBadge).toHaveText(String(count))
@@ -129,4 +129,43 @@ export async function expectFocusVisible(page: Page) {
       : getComputedStyle(target.parentElement).outlineStyle
   })
   expect(outline).not.toBe('none')
+}
+
+// Sem rolagem horizontal em nenhuma tela. No projeto mobile (celular emulado) a largura da
+// janela também precisa continuar a do aparelho: conteúdo largo demais faz o navegador
+// reduzir a página inteira, e o innerWidth cresce.
+export async function expectNoHorizontalScroll(page: Page, width: number, screen: string) {
+  try {
+    await measureHorizontalScroll(page, width, screen)
+  } catch (error) {
+    // Com muitas navegações seguidas e a máquina carregada, o Chromium às vezes ainda troca
+    // de documento depois do goto. Espera carregar e mede de novo, uma vez.
+    if (!String(error).includes('Execution context was destroyed')) throw error
+    await page.waitForLoadState()
+    await measureHorizontalScroll(page, width, screen)
+  }
+}
+
+async function measureHorizontalScroll(page: Page, width: number, screen: string) {
+  const sizes = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    inner: window.innerWidth,
+    wide: [...document.querySelectorAll('body *')]
+      .filter((element) => element.getBoundingClientRect().right > window.innerWidth + 1)
+      // As partes de um ícone contam pelo próprio <svg>.
+      .filter((element) => !(element instanceof SVGElement && element.tagName !== 'svg'))
+      // Carrosséis e faixas de abas passam da tela de propósito, dentro de um contêiner
+      // que corta ou rola: só conta o que escapa de verdade.
+      .filter((element) => {
+        for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+          if (getComputedStyle(parent).overflowX !== 'visible') {
+            return parent.getBoundingClientRect().right > window.innerWidth + 1
+          }
+        }
+        return true
+      })
+      .slice(0, 3)
+      .map((element) => `${element.tagName}.${String(element.className).slice(0, 50)}`),
+  }))
+  expect(sizes, `${screen} em ${width}px`).toEqual({ scroll: width, inner: width, wide: [] })
 }
