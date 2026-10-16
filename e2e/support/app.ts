@@ -130,3 +130,30 @@ export async function expectFocusVisible(page: Page) {
   })
   expect(outline).not.toBe('none')
 }
+
+// Sem rolagem horizontal em nenhuma tela. No projeto mobile (celular emulado) a largura da
+// janela também precisa continuar a do aparelho: conteúdo largo demais faz o navegador
+// reduzir a página inteira, e o innerWidth cresce.
+export async function expectNoHorizontalScroll(page: Page, width: number, screen: string) {
+  const sizes = await page.evaluate(() => ({
+    scroll: document.documentElement.scrollWidth,
+    inner: window.innerWidth,
+    wide: [...document.querySelectorAll('body *')]
+      .filter((element) => element.getBoundingClientRect().right > window.innerWidth + 1)
+      // As partes de um ícone contam pelo próprio <svg>.
+      .filter((element) => !(element instanceof SVGElement && element.tagName !== 'svg'))
+      // Carrosséis e faixas de abas passam da tela de propósito, dentro de um contêiner
+      // que corta ou rola: só conta o que escapa de verdade.
+      .filter((element) => {
+        for (let parent = element.parentElement; parent; parent = parent.parentElement) {
+          if (getComputedStyle(parent).overflowX !== 'visible') {
+            return parent.getBoundingClientRect().right > window.innerWidth + 1
+          }
+        }
+        return true
+      })
+      .slice(0, 3)
+      .map((element) => `${element.tagName}.${String(element.className).slice(0, 50)}`),
+  }))
+  expect(sizes, `${screen} em ${width}px`).toEqual({ scroll: width, inner: width, wide: [] })
+}
