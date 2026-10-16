@@ -92,7 +92,7 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
         </div>
       )}
 
-      <p className="text-body-sm leading-4 text-foreground">
+      <p className="text-center text-body-sm leading-4 text-foreground">
         {quote?.coupon ? (
           <>
             Cupom <strong className="text-text-accent">{quote.coupon.code}</strong> aplicado.
@@ -131,7 +131,7 @@ export function CheckoutItems({ variant, items, quote, updating }: CheckoutItems
                   {quote.networkFeeEth} ETH
                 </dd>
               </div>
-              <span className="text-caption-sm leading-4 text-text-accent">
+              <span className="text-center text-caption-sm leading-4 text-text-accent">
                 Taxa estimada ({networkLabels[quote.network]})
               </span>
             </div>

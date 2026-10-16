@@ -223,7 +223,9 @@ export function ProviderOptions({ variant, selected, disabled, onSelect }: Provi
         id="checkout-provider-title"
         className={cn(
           'font-bold text-foreground',
-          variant === 'desktop' ? 'mb-1 text-[17px] leading-4' : 'text-body-md leading-4',
+          variant === 'desktop'
+            ? 'mb-1 text-center text-[17px] leading-4'
+            : 'text-body-md leading-4',
         )}
       >
         Carteira e rede
