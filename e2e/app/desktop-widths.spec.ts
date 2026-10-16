@@ -82,6 +82,8 @@ async function goto(page: Page, path: string) {
 async function checkScreen(page: Page, width: number, screen: string, path: string, ready: string) {
   await goto(page, path)
   await page.locator(ready).first().waitFor({ state: 'attached' })
+  // O header termina de renderizar depois da sessão conferida: espera o Entrar ou o menu.
+  await page.locator('header').locator('#header-login, [data-testid="current-user"]').waitFor()
   await page.waitForTimeout(300)
   await expectNoHorizontalScroll(page, width, screen)
   await expectCleanHeader(page, `${screen} em ${width}px`)
