@@ -4,6 +4,8 @@ import { findNft, getDb, saveDb, type StoredOrder } from './db'
 import { emitNftUpdated, emitOrderUpdated } from './realtime/connections'
 
 export const PAYMENT_PROCESSING_MS = 2000
+// Cenário payment-pending: o pedido só se resolve quando a API de controle libera.
+export const SETTLE_ON_DEMAND = Number.MAX_SAFE_INTEGER
 
 const settlementTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
@@ -85,6 +87,8 @@ export function settleDueOrders() {
 // O timer só serve para emitir o order.updated na hora certa.
 export function scheduleSettlement(order: StoredOrder) {
   clearTimeout(settlementTimers.get(order.id))
+  // Um setTimeout com mais de ~24 dias estoura e dispara na hora.
+  if (order.settleAt === SETTLE_ON_DEMAND) return
   const wait = Math.max(0, order.settleAt - Date.now())
   settlementTimers.set(
     order.id,

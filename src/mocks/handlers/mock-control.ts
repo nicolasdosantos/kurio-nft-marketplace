@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { editionIdSchema } from '@/api/contracts/nfts'
 import { ethAmountSchema } from '@/api/contracts/common'
 import { findNft, getDb, resetDb, saveDb } from '../db'
-import { resumePendingOrders } from '../order-logic'
+import { resumePendingOrders, settleOrderIfDue, toPublicOrder } from '../order-logic'
 import {
   emitNftUpdated,
   getSentNftEvents,
@@ -84,6 +84,17 @@ export const mockControlHandlers = [
     for (const walletState of Object.values(db.wallets)) walletState.connected = {}
     saveDb()
     return new HttpResponse(null, { status: 204 })
+  }),
+
+  // Libera um pedido pendente (cenário payment-pending): resolve agora e emite order.updated.
+  http.post('/api/mock-control/orders/:orderId/settle', ({ params }) => {
+    const order = getDb().orders.find((item) => item.id === params.orderId)
+    if (!order) return notFound('Pedido não encontrado.')
+    if (order.status === 'pending') {
+      order.settleAt = Date.now()
+      settleOrderIfDue(order)
+    }
+    return HttpResponse.json(toPublicOrder(order))
   }),
 
   http.post('/api/mock-control/nfts/:nftId', async ({ params, request }) => {

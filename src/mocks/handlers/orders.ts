@@ -12,6 +12,7 @@ import {
 import { findNft, getDb, saveDb, type StoredOrder } from '../db'
 import {
   PAYMENT_PROCESSING_MS,
+  SETTLE_ON_DEMAND,
   scheduleSettlement,
   settleOrderIfDue,
   toPublicOrder,
@@ -128,7 +129,7 @@ export const orderHandlers = [
       idempotencyKey,
       requestFingerprint: fingerprint,
       plannedOutcome: scenario === 'payment-declined' ? 'declined' : 'confirmed',
-      settleAt: now + PAYMENT_PROCESSING_MS,
+      settleAt: scenario === 'payment-pending' ? SETTLE_ON_DEMAND : now + PAYMENT_PROCESSING_MS,
       status: 'pending',
       version: 1,
       createdAt: new Date(now).toISOString(),

@@ -13,6 +13,7 @@ export const scenarioNameSchema = z.enum([
   'edition-sold-out-at-checkout',
   'order-timeout',
   'payment-declined',
+  'payment-pending',
   'wallet-rejected',
   'wallet-disconnects',
 ])
@@ -40,6 +41,8 @@ export const scenarioDescriptions: Record<ScenarioName, string> = {
   'edition-sold-out-at-checkout': 'A edição esgota no momento de confirmar a compra',
   'order-timeout': 'O pedido é criado, mas a primeira resposta se perde',
   'payment-declined': 'O pagamento é recusado',
+  'payment-pending':
+    'O pagamento fica pendente até ser liberado (POST /api/mock-control/orders/:id/settle)',
   'wallet-rejected': 'A carteira recusa a conexão',
   'wallet-disconnects': 'A carteira desconecta antes de enviar o pedido',
 }
