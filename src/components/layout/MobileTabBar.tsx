@@ -1,6 +1,8 @@
 import { Link, useRouterState } from '@tanstack/react-router'
 import { useCartCount } from '@/api/cart'
 import { useSession } from '@/session/session-store'
+import { useBumpKey } from '@/lib/use-bump-key'
+import { cn } from '@/lib/utils'
 
 // Ícones laterais posicionados em % da largura, para a barra acompanhar telas menores;
 // as peças do ícone central são relativas ao círculo.
@@ -17,6 +19,7 @@ const sideIconClasses = 'absolute top-[71px] grid size-5 place-items-center'
 export function MobileTabBar() {
   const session = useSession()
   const cartCount = useCartCount()
+  const cartBump = useBumpKey(cartCount)
   const pathname = useRouterState({ select: (state) => state.location.pathname })
   const accountPath = session.user ? '/perfil' : '/login'
 
@@ -72,7 +75,13 @@ export function MobileTabBar() {
       >
         <img src="/icons/mobile-shop.svg" alt="" width={20} height={20} />
         {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink">
+          <span
+            key={cartBump}
+            className={cn(
+              'absolute -top-2 -right-2 grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink',
+              cartBump > 0 && 'animate-bump',
+            )}
+          >
             <span data-testid="cart-count">{cartCount}</span>
           </span>
         )}

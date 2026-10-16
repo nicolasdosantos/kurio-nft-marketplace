@@ -61,7 +61,7 @@ export function OrderReceipt({ order, variant, titleAs: Title }: OrderReceiptPro
   ]
 
   return (
-    <div className="flex flex-col text-text-secondary">
+    <div className="rise-in flex flex-col text-text-secondary">
       <header className="flex flex-col items-center gap-4 px-6 pt-[22px] pb-[22px] text-center">
         <div className="grid size-20 place-items-center text-primary">
           {status === 'confirmed' && <ThankYouIcon />}

@@ -49,6 +49,48 @@
   --text-tiny-sm--line-height: 1;
 
   --animate-shimmer: shimmer 1.6s linear infinite;
+  /* Animações só de transform/opacity (não mexem no layout). */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-bump: bump 380ms var(--ease-spring);
+  --animate-pop: pop 420ms var(--ease-spring);
+
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+  }
+
+  @keyframes burst {
+    from {
+      opacity: 0.7;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 0;
+      transform: scale(1.6);
+    }
+  }
+
+  @keyframes bump {
+    40% {
+      transform: scale(1.35);
+    }
+  }
+
+  @keyframes pop {
+    45% {
+      transform: scale(1.25);
+    }
+  }
 
   @keyframes shimmer {
     from {
@@ -122,6 +164,21 @@
   fieldset {
     min-inline-size: 0;
   }
+  /* Reação leve ao clique nos botões e fade curto quando uma página nova entra.
+     O fade é só CSS no elemento novo: remontar a árvore com uma key faria o pagamento
+     montar de novo e reenviar a tentativa guardada. Com movimento reduzido, nada se move. */
+  @media (prefers-reduced-motion: no-preference) {
+    /* Páginas com a imagem de LCP (hero do Início, imagem do Detalhe) entram sem fade. */
+    [data-navigated] #conteudo > :not(:has(img[fetchpriority='high'])) {
+      animation: page-in 280ms var(--ease-out-soft);
+    }
+    button:not(:disabled) {
+      transition: transform 150ms ease-out;
+    }
+    button:not(:disabled):active {
+      transform: scale(0.97);
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -132,5 +189,34 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Entradas: conteúdo que substitui o skeleton sobe 12px com fade; em listas, um item por
+   vez (--stagger = posição). Seções abaixo da dobra entram conforme a rolagem (animação
+   ligada à rolagem, só CSS). Tudo some com prefers-reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .rise-in {
+    animation: rise-in 420ms var(--ease-out-soft) both;
+    animation-delay: calc(min(var(--stagger, 0), 12) * 50ms);
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 60%;
+    }
+  }
+
+  /* Anel que se expande quando o NFT entra nos favoritos. */
+  .heart-burst::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    border: 2px solid var(--color-primary);
+    pointer-events: none;
+    animation: burst 420ms var(--ease-out-soft) both;
   }
 }

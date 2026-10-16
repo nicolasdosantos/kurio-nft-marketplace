@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactNode, type CSSProperties } from 'react'
 import { Link, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
 import { Trash2 } from 'lucide-react'
 import { useCart, useQuote, useRemoveCartItem, useUpdateCartItem } from '@/api/cart'
@@ -143,16 +143,16 @@ export function CartPage() {
         <ul
           aria-label="Itens do carrinho"
           data-testid="cart-items"
-          className="flex flex-col gap-5 px-7"
+          className="rise-in flex flex-col gap-5 px-7"
         >
-          {lines.map((line) => (
-            <MobileCartLine key={line.cartItem.id} line={line} {...lineActions} />
+          {lines.map((line, index) => (
+            <MobileCartLine key={line.cartItem.id} index={index} line={line} {...lineActions} />
           ))}
         </ul>
         <div className="px-7">{feedback}</div>
         <section
           aria-label="Resumo do pedido"
-          className="-mt-2 rounded-t-[40px] bg-surface-card px-6 pt-6 pb-9"
+          className="rise-in -mt-2 rounded-t-[40px] bg-surface-card px-6 pt-6 pb-9"
         >
           <CartSummary
             variant="mobile"
@@ -167,7 +167,7 @@ export function CartPage() {
     )
   } else {
     content = (
-      <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-[86px]">
+      <div className="rise-in flex flex-col gap-12 lg:flex-row lg:items-start lg:gap-[86px]">
         <div className="min-w-0 flex-1 lg:max-w-[782px]">
           <table
             data-testid="cart-items"
@@ -202,8 +202,13 @@ export function CartPage() {
               </tr>
             </thead>
             <tbody>
-              {lines.map((line) => (
-                <DesktopCartLine key={line.cartItem.id} line={line} {...lineActions} />
+              {lines.map((line, index) => (
+                <DesktopCartLine
+                  key={line.cartItem.id}
+                  index={index}
+                  line={line}
+                  {...lineActions}
+                />
               ))}
             </tbody>
           </table>
@@ -304,6 +309,8 @@ function AlsoViewed({ cartItems }: { cartItems: CartItem[] }) {
 
 interface LineProps {
   line: LineState
+  // Posição na lista, para os itens entrarem um de cada vez.
+  index?: number
   busy: boolean
   onQuantity: (cartItem: CartItem, quantity: number) => void
   onAcceptPrice: (cartItem: CartItem) => void
@@ -372,7 +379,10 @@ function DesktopCartLine(props: LineProps) {
   const image = nftImageSources(cartItem.imageUrl)
 
   return (
-    <tr className="text-body-md leading-4 font-bold">
+    <tr
+      style={{ '--stagger': props.index ?? 0 } as CSSProperties}
+      className="rise-in text-body-md leading-4 font-bold"
+    >
       <td className="bg-surface-card p-0 align-middle">
         <div className="flex items-center gap-4">
           <img
@@ -452,7 +462,10 @@ function MobileCartLine(props: LineProps) {
   const canIncrease = !busy && cartItem.quantity < line.maxQuantity
 
   return (
-    <li className="relative flex min-h-[100px] rounded-[14px] bg-surface-card shadow-[0_6px_20px_rgb(10_6_4/0.45)]">
+    <li
+      style={{ '--stagger': props.index ?? 0 } as CSSProperties}
+      className="rise-in relative flex min-h-[100px] rounded-[14px] bg-surface-card shadow-[0_6px_20px_rgb(10_6_4/0.45)]"
+    >
       <img
         src={image.src}
         alt=""

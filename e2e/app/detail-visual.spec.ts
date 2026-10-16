@@ -5,6 +5,11 @@ import { startCleanMockServer } from '../support/mock-api'
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
+// Capturas estáveis: com movimento reduzido as entradas e as animações de rolagem ficam desligadas.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
 test('regressão visual do detalhe', async ({ page }) => {
   await startCleanMockServer(page)
   await page.goto('/nft/emerald-ape-042')

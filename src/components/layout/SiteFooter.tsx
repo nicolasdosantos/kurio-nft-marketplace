@@ -50,7 +50,7 @@ const socialNetworks = [
 export function SiteFooter() {
   return (
     <footer className="mx-auto mt-24 w-full max-w-[1232px] px-4 pb-36 md:pb-6">
-      <section className="grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-4 lg:gap-0 xl:flex xl:h-[250px] xl:items-end">
+      <section className="reveal grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-4 lg:gap-0 xl:flex xl:h-[250px] xl:items-end">
         {highlights.map((highlight) => (
           <div
             key={highlight.title}
@@ -103,7 +103,7 @@ export function SiteFooter() {
       </section>
 
       {/* Coluna no celular, 2 colunas no tablet e a linha do Figma a partir de 1024px. */}
-      <section className="flex flex-col gap-4 bg-surface-dark p-8 text-body-sm leading-[22px] text-foreground md:grid md:grid-cols-2 lg:flex lg:h-[88px] lg:flex-row lg:items-center lg:gap-8 xl:gap-[92px]">
+      <section className="reveal flex flex-col gap-4 bg-surface-dark p-8 text-body-sm leading-[22px] text-foreground md:grid md:grid-cols-2 lg:flex lg:h-[88px] lg:flex-row lg:items-center lg:gap-8 xl:gap-[92px]">
         <span className="flex-1 font-bold tracking-[1.4px]">KURIO</span>
         <p className="flex-1 lg:whitespace-nowrap">
           Feito para colecionadores,
@@ -118,7 +118,7 @@ export function SiteFooter() {
         </a>
       </section>
 
-      <section className="grid gap-8 bg-surface-card p-8 md:grid-cols-2 lg:grid-cols-4 xl:flex xl:gap-[124px]">
+      <section className="reveal grid gap-8 bg-surface-card p-8 md:grid-cols-2 lg:grid-cols-4 xl:flex xl:gap-[124px]">
         {linkColumns.map((column) => (
           <nav key={column.title} aria-label={column.title} className="flex flex-1 flex-col gap-2">
             <h2 className="text-body-lg font-bold text-foreground">{column.title}</h2>

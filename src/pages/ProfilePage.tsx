@@ -134,7 +134,7 @@ function ProfileForms({ profile, variant }: ProfileFormsProps) {
       : ''
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="rise-in flex flex-col gap-8">
       <form
         noValidate
         aria-labelledby="profile-title"

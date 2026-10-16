@@ -6,6 +6,11 @@ import { callApi, login, startCleanMockServer } from '../support/mock-api'
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
+// Capturas estáveis: com movimento reduzido as entradas e as animações de rolagem ficam desligadas.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
 // Desktop: os itens do frame do Figma. O frame mobile não mostra itens.
 const desktopItems = [
   ['emerald-ape-042', '1-50', 2],

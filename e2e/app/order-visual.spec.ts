@@ -6,6 +6,11 @@ import { callApi, login, orderBody, startCleanMockServer } from '../support/mock
 // da imagem oficial do Playwright (pnpm test:visual).
 test.skip(!process.env.PLAYWRIGHT_DOCKER, 'regressão visual roda no Docker: pnpm test:visual')
 
+// Capturas estáveis: com movimento reduzido as entradas e as animações de rolagem ficam desligadas.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' })
+})
+
 // Os mesmos itens do frame do Figma.
 const items = [
   ['emerald-ape-042', '1-50', 2],

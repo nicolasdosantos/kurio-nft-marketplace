@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useState, type CSSProperties } from 'react'
 import { Link } from '@tanstack/react-router'
 import type { NftSummary } from '@/api/contracts/nfts'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -28,7 +28,7 @@ export function NftCarousel({ title, items, isPending }: NftCarouselProps) {
   if (!isPending && items.length === 0) return null
 
   return (
-    <section aria-labelledby={titleId} className="flex flex-col gap-8">
+    <section aria-labelledby={titleId} className="reveal flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <h2 id={titleId} className="text-[17px] leading-4 font-bold text-text-accent">
           {title}
@@ -44,8 +44,12 @@ export function NftCarousel({ title, items, isPending }: NftCarouselProps) {
                 <Skeleton className="h-9 w-2/3" />
               </li>
             ))
-          : visible.map((item) => (
-              <li key={item.id} className="relative flex flex-col gap-3">
+          : visible.map((item, index) => (
+              <li
+                key={item.id}
+                style={{ '--stagger': index } as CSSProperties}
+                className="rise-in relative flex flex-col gap-3"
+              >
                 <div className="grid aspect-[219/255] place-items-center bg-surface-card px-1">
                   <img
                     {...nftImageSources(item.imageUrl)}

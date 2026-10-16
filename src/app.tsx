@@ -60,4 +60,12 @@ export function renderApp(rootElement: HTMLElement) {
     stopWaiting()
     requestAnimationFrame(() => requestAnimationFrame(() => void startMocks()))
   })
+
+  // O fade de troca de página só vale a partir da primeira navegação dentro do app: na
+  // carga inicial ele atrasaria o LCP (o Chrome só conta o elemento quando fica visível).
+  const stopWatchingNavigation = router.subscribe('onBeforeNavigate', (event) => {
+    if (!event.fromLocation || !event.pathChanged) return
+    stopWatchingNavigation()
+    document.documentElement.dataset.navigated = 'true'
+  })
 }

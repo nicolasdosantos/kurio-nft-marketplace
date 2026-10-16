@@ -509,11 +509,12 @@ export function CheckoutPage() {
       <form
         noValidate
         onSubmit={form.handleSubmit(confirmPurchase)}
-        className={
+        className={cn(
+          'rise-in',
           isTabletUp
             ? 'grid gap-12 lg:grid-cols-[minmax(0,763px)_405px] lg:justify-between lg:gap-8'
-            : 'flex flex-col gap-4'
-        }
+            : 'flex flex-col gap-4',
+        )}
       >
         {isTabletUp ? (
           <>

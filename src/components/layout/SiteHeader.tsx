@@ -4,6 +4,8 @@ import { useCartCount } from '@/api/cart'
 import { Input } from '@/components/ui/input'
 import { useSession } from '@/session/session-store'
 import { ComingSoon } from './ComingSoon'
+import { useBumpKey } from '@/lib/use-bump-key'
+import { cn } from '@/lib/utils'
 
 // O menu da conta (DropdownMenu do Radix) só é baixado para quem está logado.
 const UserMenu = lazy(() => import('./UserMenu').then((module) => ({ default: module.UserMenu })))
@@ -50,6 +52,7 @@ function HeaderSearch({ onDone }: { onDone: () => void }) {
 export function SiteHeader() {
   const session = useSession()
   const cartCount = useCartCount()
+  const cartBump = useBumpKey(cartCount)
   const [searchOpen, setSearchOpen] = useState(false)
   const isHome = useRouterState({ select: (state) => state.location.pathname === '/' })
 
@@ -95,7 +98,13 @@ export function SiteHeader() {
             className="relative grid size-6 place-items-start rounded-sm"
           >
             <img src="/icons/cart.svg" alt="" width={24} height={24} />
-            <span className="absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink">
+            <span
+              key={cartBump}
+              className={cn(
+                'absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink',
+                cartBump > 0 && 'animate-bump',
+              )}
+            >
               <span data-testid="cart-count">{cartCount}</span>
             </span>
           </Link>

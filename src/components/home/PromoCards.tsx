@@ -18,7 +18,7 @@ const promos: { title: string[]; text: string; image: string; search: CatalogSea
 
 export function PromoCards() {
   return (
-    <section aria-label="Promoções" className="hidden gap-7 md:grid md:grid-cols-2">
+    <section aria-label="Promoções" className="reveal hidden gap-7 md:grid md:grid-cols-2">
       {promos.map((promo) => (
         <article
           key={promo.title[0]}

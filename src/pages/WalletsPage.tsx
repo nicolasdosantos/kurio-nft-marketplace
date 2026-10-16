@@ -49,7 +49,7 @@ export function WalletsPage() {
           </button>
         </div>
       ) : (
-        <div className="flex flex-col gap-10">
+        <div className="rise-in flex flex-col gap-10">
           <WalletSection
             slot="primary"
             wallet={walletsQuery.data.primary}

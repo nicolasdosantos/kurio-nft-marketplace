@@ -23,7 +23,7 @@ export function NftInfoTabs({ nft }: { nft: Nft }) {
   const network = networkLabels[nft.network]
 
   return (
-    <Tabs defaultValue="detalhes" className="gap-3">
+    <Tabs defaultValue="detalhes" className="reveal gap-3">
       <TabsList
         variant="line"
         aria-label="Informações do NFT"
