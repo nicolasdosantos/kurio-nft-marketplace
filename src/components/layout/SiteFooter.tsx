@@ -63,7 +63,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
     >
       <section
         ref={revealRef1}
-        className="grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-4 lg:gap-0 xl:flex xl:h-[250px] xl:items-end"
+        className="grid gap-8 bg-surface-card p-6 md:grid-cols-2 md:p-8 lg:grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.5fr)] lg:gap-0 xl:flex xl:h-[250px] xl:items-end"
       >
         {highlights.map((highlight) => (
           <div
@@ -173,7 +173,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
           </div>
           <div className="flex flex-col gap-3">
             <h2 className="text-body-lg font-bold text-foreground">Carteiras compatíveis</h2>
-            <p className="flex h-[26px] items-center justify-center rounded-[6px] border border-border-soft bg-surface-dark text-tiny-sm font-bold tracking-[0.1px] whitespace-pre text-text-accent">
+            <p className="flex min-h-[26px] items-center justify-center rounded-[6px] border border-border-soft bg-surface-dark px-2 py-1 text-center text-tiny-sm font-bold tracking-[0.1px] text-text-accent xl:h-[26px] xl:px-0 xl:py-0 xl:whitespace-pre">
               {'METAMASK  •  WALLETCONNECT  •  COINBASE'}
             </p>
           </div>

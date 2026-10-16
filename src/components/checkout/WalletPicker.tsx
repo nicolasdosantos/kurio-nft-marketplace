@@ -166,7 +166,7 @@ function WalletCard({
             <span className="text-body-md leading-4 font-bold text-foreground">{label}</span>
             <span className="text-body-sm leading-[22px] text-text-secondary">
               <span className="block truncate">{wallet.ensName || shortHex(wallet.address)}</span>
-              <span className="block truncate">{networkDescriptions[wallet.network]}</span>
+              <span className="block">{networkDescriptions[wallet.network]}</span>
             </span>
           </span>
         </span>

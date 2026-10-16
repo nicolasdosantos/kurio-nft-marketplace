@@ -121,7 +121,7 @@ export function AuthLayout({
           }}
           // No Figma o modal fica logo abaixo do header, não centralizado;
           // em telas baixas ele sobe e ganha rolagem, sem passar da borda.
-          className="top-[clamp(16px,calc(50%-300px),160px)] flex max-h-[calc(100dvh-32px)] min-h-[600px] w-[500px] max-w-[calc(100%-2rem)] translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-0 border-b-[10px] border-primary bg-surface-card px-20 pt-12 pb-16 ring-0 sm:max-w-[500px]"
+          className="top-[clamp(16px,calc(50%-300px),160px)] flex max-h-[calc(100dvh-32px)] min-h-[min(600px,calc(100dvh-32px))] w-[500px] max-w-[calc(100%-2rem)] translate-y-0 flex-col gap-0 overflow-y-auto rounded-none border-0 border-b-[10px] border-primary bg-surface-card px-20 pt-12 pb-16 ring-0 sm:max-w-[500px]"
         >
           <DialogClose
             aria-label="Fechar"
