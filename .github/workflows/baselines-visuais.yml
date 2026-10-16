@@ -1,0 +1,61 @@
+# Regressão visual na mesma imagem do `pnpm test:visual`, para quem não tem Docker funcionando.
+# "conferir" compara com as baselines versionadas; "atualizar" regrava e publica as capturas
+# como artifact. O workflow nunca commita: as baselines novas são conferidas e commitadas à mão.
+name: Baselines visuais
+
+on:
+  workflow_dispatch:
+    inputs:
+      modo:
+        description: Conferir as baselines ou regravá-las
+        type: choice
+        options:
+          - conferir
+          - atualizar
+        default: conferir
+
+permissions:
+  contents: read
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.0-noble
+      options: --ipc=host
+    env:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: 0
+      PLAYWRIGHT_DOCKER: 1
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: |
+          corepack enable
+          pnpm install --frozen-lockfile
+
+      - name: Conferir baselines
+        if: inputs.modo == 'conferir'
+        run: pnpm exec playwright test e2e/app/*-visual.spec.ts
+
+      - name: Regravar baselines
+        if: inputs.modo == 'atualizar'
+        run: pnpm exec playwright test e2e/app/*-visual.spec.ts --update-snapshots=all
+
+      - name: Publicar baselines
+        if: inputs.modo == 'atualizar'
+        uses: actions/upload-artifact@v4
+        with:
+          name: baselines-visuais
+          path: e2e/app/*-snapshots/*.png
+          if-no-files-found: error
+
+      - name: Publicar relatório
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-playwright
+          path: |
+            playwright-report/
+            test-results/
