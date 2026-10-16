@@ -6,11 +6,12 @@ test.beforeEach(async ({ page }) => {
   await startCleanMockServer(page)
 })
 
-async function expectComingSoon(item: Locator, { lock }: { lock: boolean }) {
+async function expectComingSoon(item: Locator) {
   await expect(item).toHaveAttribute('aria-disabled', 'true')
   await expect(item).toContainText('(em breve)')
   await expect(item).toHaveCSS('opacity', '1')
-  await expect(item.locator('svg.lucide-lock')).toHaveCount(lock ? 1 : 0)
+  // Sem ícone extra: o Figma não tem cadeado.
+  await expect(item.locator('svg')).toHaveCount(0)
 }
 
 test('itens "em breve" do header e do rodapé: aparência normal, tooltip e clique sem ação', async ({
@@ -20,7 +21,7 @@ test('itens "em breve" do header e do rodapé: aparência normal, tooltip e cliq
   await page.goto('/')
   const header = page.getByRole('navigation', { name: 'Principal' })
   const creators = header.locator('[aria-disabled="true"]', { hasText: 'Criadores' })
-  await expectComingSoon(creators, { lock: true })
+  await expectComingSoon(creators)
 
   const tooltip = creators.getByText('Em breve', { exact: true })
   await expect(tooltip).toBeHidden()
@@ -36,23 +37,23 @@ test('itens "em breve" do header e do rodapé: aparência normal, tooltip e cliq
   await expect(tooltip).toBeVisible()
   await expectFocusVisible(page)
 
-  // Rodapé: mesmo padrão, sem o cadeado.
+  // Rodapé: mesmo padrão.
   const footerLink = page.locator('footer [aria-disabled="true"]', { hasText: 'Central de ajuda' })
   await footerLink.scrollIntoViewIfNeeded()
-  await expectComingSoon(footerLink, { lock: false })
+  await expectComingSoon(footerLink)
   await footerLink.hover()
   await expect(footerLink.getByText('Em breve', { exact: true })).toBeVisible()
   await footerLink.click({ force: true })
   await expect(page).toHaveURL(/\/$/)
 })
 
-test('menu da conta: itens "em breve" com cadeado, tooltip e sem ação', async ({ page }) => {
+test('menu da conta: itens "em breve" com tooltip e sem ação', async ({ page }) => {
   test.skip(!isDesktopLayout(page), 'o menu da conta fica no header')
   await loginThroughUi(page, 'ana@kurio.dev')
   await page.getByTestId('current-user').click()
   const activity = page.getByRole('menuitem', { name: /Atividade/ })
   await expect(activity).toHaveAttribute('aria-disabled', 'true')
-  await expect(activity.locator('svg.lucide-lock')).toHaveCount(1)
+  await expect(activity.locator('svg')).toHaveCount(0)
   await expect(activity).toHaveCSS('opacity', '1')
   await activity.hover()
   await expect(activity.getByText('Em breve', { exact: true })).toBeVisible()

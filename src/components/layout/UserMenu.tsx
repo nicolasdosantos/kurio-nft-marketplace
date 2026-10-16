@@ -1,5 +1,4 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { Lock } from 'lucide-react'
 import { useLogout } from '@/api/auth'
 import {
   DropdownMenu,
@@ -58,7 +57,6 @@ export function UserMenu() {
             className="group/soon cursor-not-allowed"
           >
             {label}
-            <Lock aria-hidden="true" className="size-3 text-secondary" strokeWidth={2} />
             <span className="sr-only"> (em breve)</span>
             <span
               aria-hidden="true"

@@ -359,13 +359,13 @@ export function CheckoutPage() {
           {/* Programa de indicação fora do escopo. */}
           <div className="flex flex-col">
             <FieldLabel htmlFor="checkout-referral">Código de indicação</FieldLabel>
-            <ComingSoon className="flex w-full gap-2">
+            <ComingSoon className="block">
               <input
                 id="checkout-referral"
                 disabled
                 placeholder="Em breve"
                 className={cn(
-                  'min-w-0 flex-1 border border-field-border bg-transparent px-3 text-body-sm placeholder:text-secondary',
+                  'w-full border border-field-border bg-transparent px-3 text-body-sm placeholder:text-secondary',
                   isTabletUp ? 'h-10 rounded-[3px]' : 'h-[50px] rounded-[10px] bg-surface-card',
                 )}
               />

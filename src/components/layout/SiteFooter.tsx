@@ -93,7 +93,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <label htmlFor="newsletter-email" className="sr-only">
               E-mail para novidades (em breve)
             </label>
-            <ComingSoon showLock={false} className="flex h-10 min-w-0 flex-1 items-center gap-0">
+            <ComingSoon className="flex h-10 min-w-0 flex-1 items-center">
               <input
                 id="newsletter-email"
                 type="email"
@@ -146,7 +146,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <ul className="text-body-sm leading-[30px] text-foreground">
               {column.links.map((label) => (
                 <li key={label}>
-                  <ComingSoon showLock={false}>{label}</ComingSoon>
+                  <ComingSoon>{label}</ComingSoon>
                 </li>
               ))}
             </ul>
@@ -158,7 +158,7 @@ export function SiteFooter({ reserveBottomBar }: { reserveBottomBar: boolean }) 
             <ul className="flex gap-2.5">
               {socialNetworks.map((network) => (
                 <li key={network.name}>
-                  <ComingSoon showLock={false} className="block">
+                  <ComingSoon className="block">
                     <img
                       src={network.icon}
                       alt={network.name}

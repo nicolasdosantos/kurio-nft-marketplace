@@ -1,31 +1,19 @@
 import type { ReactNode } from 'react'
-import { Lock } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-// Itens do layout que não fazem parte da entrega: têm a aparência normal, mas o cadeado e o
-// tooltip "Em breve" deixam claro que não funcionam. Clicar não faz nada.
-export function ComingSoon({
-  children,
-  className,
-  showLock = true,
-}: {
-  children: ReactNode
-  className?: string
-  showLock?: boolean
-}) {
+// Itens do layout que não fazem parte da entrega: têm a aparência normal, mas o tooltip
+// "Em breve" (hover, foco e toque) deixa claro que não funcionam. Clicar não faz nada.
+export function ComingSoon({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <span
       tabIndex={0}
       aria-disabled="true"
       className={cn(
-        'group/soon relative inline-flex cursor-not-allowed items-center gap-1.5 rounded-sm',
+        'group/soon relative inline-flex cursor-not-allowed items-center rounded-sm',
         className,
       )}
     >
       {children}
-      {showLock && (
-        <Lock aria-hidden="true" className="size-3 shrink-0 text-secondary" strokeWidth={2} />
-      )}
       <span className="sr-only"> (em breve)</span>
       {/* hidden em vez de opacity: escondido, não ocupa espaço nem passa da borda da tela. */}
       <span
