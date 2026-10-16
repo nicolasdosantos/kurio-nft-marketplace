@@ -12,7 +12,7 @@ import { createOrderRequestSchema, type CreateOrderRequest } from '@/api/contrac
 import { isRetryableError } from '@/api/errors'
 import { useCreateOrder, useOrder } from '@/api/orders'
 import { queryKeys } from '@/api/query-keys'
-import { CheckoutField, CheckoutTextarea, FieldLabel } from '@/components/checkout/CheckoutField'
+import { FieldLabel, FormField, FormTextarea } from '@/components/form/FormField'
 import { CheckoutItems } from '@/components/checkout/CheckoutItems'
 import {
   NoResponse,
@@ -344,7 +344,7 @@ export function CheckoutPage() {
         </h2>
         <fieldset disabled={locked} className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
           {collectorFields.map((field) => (
-            <CheckoutField
+            <FormField
               key={field.name}
               id={`checkout-${field.name}`}
               label={field.label}
@@ -406,7 +406,7 @@ export function CheckoutPage() {
     )
 
     const noteField = (
-      <CheckoutTextarea
+      <FormTextarea
         id="checkout-note"
         label="Observação do colecionador (opcional)"
         variant={variant}
