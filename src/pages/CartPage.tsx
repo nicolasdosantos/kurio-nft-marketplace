@@ -360,7 +360,7 @@ function RemoveButton({ line, busy, onRemove, className }: LineProps & { classNa
       onClick={() => onRemove(line.cartItem)}
       className={cn('grid size-6 place-items-center text-secondary disabled:opacity-40', className)}
     >
-      {/* Provisório: o SVG do Figma (Iconly/Curved/Delete) não pôde ser exportado ainda. */}
+      {/* Ícone da lucide no lugar do desenhado no Figma, com a mesma forma. */}
       <Trash2 aria-hidden="true" className="size-6" strokeWidth={1.5} />
     </button>
   )

@@ -192,7 +192,7 @@ function ProviderMark({ type }: { type: WalletType }) {
     >
       {type === 'walletconnect' && 'W'}
       {type === 'metamask' && 'M'}
-      {/* Provisório: o ícone Iconly/Curved/Wallet do Figma não pôde ser exportado. */}
+      {/* Ícone da lucide no lugar do desenhado no Figma, com a mesma forma. */}
       {type === 'coinbase' && <WalletIcon className="size-6 text-primary" strokeWidth={1.5} />}
     </span>
   )

@@ -1,4 +1,4 @@
-// Ícone "thank-you" redesenhado: o SVG original do Figma não pôde ser exportado.
+// Ícone "thank-you" do comprovante, desenhado em SVG com a forma do Figma.
 // Decorativo: o título ao lado diz o mesmo.
 export function ThankYouIcon({ className }: { className?: string }) {
   return (
