@@ -3,6 +3,7 @@ import type { Nft } from '@/api/contracts/nfts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { networkLabels } from '@/lib/display'
 import { StarRating } from './StarRating'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 const contractStandards: Record<Network, string> = {
   ethereum: 'ERC-721',
@@ -20,10 +21,11 @@ function shortAddress(address: string) {
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium' })
 
 export function NftInfoTabs({ nft }: { nft: Nft }) {
+  const revealRef = useRevealOnScroll<HTMLDivElement>()
   const network = networkLabels[nft.network]
 
   return (
-    <Tabs defaultValue="detalhes" className="reveal gap-3">
+    <Tabs defaultValue="detalhes" ref={revealRef} className="gap-3">
       <TabsList
         variant="line"
         aria-label="Informações do NFT"

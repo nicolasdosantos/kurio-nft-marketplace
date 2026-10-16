@@ -4,7 +4,7 @@ export function HomeHero() {
       aria-labelledby="hero-title"
       className="hidden min-h-[450px] items-center justify-between gap-8 pl-10 md:flex"
     >
-      <div className="rise-in flex w-full max-w-[600px] flex-col items-end gap-11">
+      <div className="flex w-full max-w-[600px] flex-col items-end gap-11">
         <div className="flex w-full flex-col items-start gap-8">
           <div className="flex flex-col gap-1">
             <div className="flex flex-col gap-2 text-foreground">
@@ -56,7 +56,7 @@ export function MobileHeroBanner() {
         fetchPriority="high"
         className="absolute inset-0 size-full"
       />
-      <div className="rise-in relative flex w-full items-center gap-2">
+      <div className="relative flex w-full items-center gap-2">
         <div className="flex min-w-0 flex-1 flex-col">
           <div className="flex flex-col gap-1.5">
             <p className="text-caption-sm leading-4 font-medium text-foreground">

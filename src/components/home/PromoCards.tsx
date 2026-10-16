@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import type { CatalogSearch } from '@/lib/catalog-search'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 const promos: { title: string[]; text: string; image: string; search: CatalogSearch }[] = [
   {
@@ -17,8 +18,9 @@ const promos: { title: string[]; text: string; image: string; search: CatalogSea
 ]
 
 export function PromoCards() {
+  const revealRef = useRevealOnScroll<HTMLElement>()
   return (
-    <section aria-label="Promoções" className="reveal hidden gap-7 md:grid md:grid-cols-2">
+    <section aria-label="Promoções" ref={revealRef} className="hidden gap-7 md:grid md:grid-cols-2">
       {promos.map((promo) => (
         <article
           key={promo.title[0]}

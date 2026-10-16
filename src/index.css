@@ -193,20 +193,23 @@
 }
 
 /* Entradas: conteúdo que substitui o skeleton sobe 12px com fade; em listas, um item por
-   vez (--stagger = posição). Seções abaixo da dobra entram conforme a rolagem (animação
-   ligada à rolagem, só CSS). Tudo some com prefers-reduced-motion. */
+   vez (--stagger = posição). Tudo some com prefers-reduced-motion. */
 @media (prefers-reduced-motion: no-preference) {
   .rise-in {
     animation: rise-in 420ms var(--ease-out-soft) both;
     animation-delay: calc(min(var(--stagger, 0), 12) * 50ms);
   }
 
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation: rise-in linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 60%;
-    }
+  /* Seções abaixo da dobra (useRevealOnScroll): invisíveis até entrar na tela, depois
+     chegam rápido à opacidade total. Nunca ficam paradas no meio do caminho. */
+  [data-reveal] {
+    transition:
+      opacity 450ms var(--ease-out-soft),
+      transform 450ms var(--ease-out-soft);
+  }
+  [data-reveal='hidden'] {
+    opacity: 0;
+    transform: translateY(16px);
   }
 
   /* Anel que se expande quando o NFT entra nos favoritos. */

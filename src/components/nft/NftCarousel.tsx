@@ -5,6 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { nftImageSources } from '@/lib/display'
 import { useIsDesktop, useMediaQuery } from '@/lib/use-media-query'
 import { cn } from '@/lib/utils'
+import { useRevealOnScroll } from '@/lib/use-reveal-on-scroll'
 
 interface NftCarouselProps {
   title: string
@@ -14,6 +15,7 @@ interface NftCarouselProps {
 
 // Carrossel de cards ("Mais desta coleção", "Colecionadores também viram").
 export function NftCarousel({ title, items, isPending }: NftCarouselProps) {
+  const revealRef = useRevealOnScroll<HTMLElement>()
   const titleId = useId()
   const isDesktop = useIsDesktop()
   const isTabletUp = useMediaQuery('(min-width: 768px)')
@@ -28,7 +30,7 @@ export function NftCarousel({ title, items, isPending }: NftCarouselProps) {
   if (!isPending && items.length === 0) return null
 
   return (
-    <section aria-labelledby={titleId} className="reveal flex flex-col gap-8">
+    <section aria-labelledby={titleId} ref={revealRef} className="flex flex-col gap-8">
       <div className="flex flex-col gap-3">
         <h2 id={titleId} className="text-[17px] leading-4 font-bold text-text-accent">
           {title}
