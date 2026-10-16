@@ -171,8 +171,9 @@ export function CartPage() {
         <div className="min-w-0 flex-1 lg:max-w-[782px]">
           <table
             data-testid="cart-items"
-            // O espaçamento entre linhas também entra antes do cabeçalho: a margem compensa.
-            className="-mt-3 w-full border-separate border-spacing-y-3"
+            // O espaço de 12px entre as linhas é uma borda transparente nas células: com
+            // border-spacing o Chrome somava 24px entre o cabeçalho e o primeiro item.
+            className="w-full border-separate border-spacing-0 [&_tbody_td]:border-t-12 [&_tbody_td]:border-transparent [&_tbody_td]:bg-clip-padding"
           >
             <caption className="sr-only">Itens do carrinho</caption>
             <thead>
@@ -264,7 +265,9 @@ export function CartPage() {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-8">
+    // Como no Pagamento: no Figma o conteúdo começa em y=101 e o header do app é 9px mais
+    // baixo que a linha do header desses frames.
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px]">
       <div className="flex flex-col gap-3">
         <h1 className="sr-only">Carrinho de NFTs</h1>
         <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
