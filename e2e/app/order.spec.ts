@@ -1,5 +1,10 @@
 import { expect, test, type Page } from '@playwright/test'
-import { expectFocusVisible, isDesktopLayout, loginThroughUi } from '../support/app'
+import {
+  expectFocusVisible,
+  isDesktopLayout,
+  loginThroughUi,
+  logoutThroughUi,
+} from '../support/app'
 import {
   callApi,
   orderBody,
@@ -131,8 +136,7 @@ test('o recibo não muda quando o preço do NFT muda depois da compra', async ({
 
 test('o Bruno não consegue abrir o pedido da Ana', async ({ page }) => {
   // order-ana-0001 é o pedido antigo da Ana nas fixtures.
-  await page.goto('/')
-  await page.evaluate(() => localStorage.removeItem('kurio:token'))
+  await logoutThroughUi(page)
   await loginThroughUi(page, 'bruno@kurio.dev')
 
   const response = await callApi(page, 'GET', '/api/orders/order-ana-0001', {
