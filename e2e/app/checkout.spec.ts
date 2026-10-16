@@ -246,7 +246,8 @@ test.describe('com Sage Nomad #009 no carrinho', () => {
     await expect(page.getByTestId('order-status')).toHaveText(
       /Seus NFTs agora estão na sua carteira/,
     )
-    await expectCartCount(page, 2)
+    // No mobile o comprovante não tem tab bar (nem badge): confere pela API.
+    await expect.poll(() => cartQuantity(page)).toBe(2)
   })
 
   test('carteira: recusa, app errado, desconexão e conexão perdida no envio', async ({ page }) => {
@@ -386,11 +387,13 @@ test('compra completa do catálogo ao recibo', async ({ page }) => {
   await expect(page).toHaveURL(/\/pedidos\/order-/)
   await expect(page.getByTestId('order-status')).toHaveText(/Seus NFTs agora estão na sua carteira/)
   const receipt = page.getByRole('region', { name: 'Recibo' })
-  await expect(receipt).toContainText(nftName)
-  await expect(receipt).toContainText('x1')
-  await expect(receipt).toContainText(`Taxa de rede: ${shownFee}`)
-  await expect(receipt).toContainText(`Total: ${shownTotal}`)
-  await expect(receipt).toContainText('metamask')
-  await expect(receipt).toContainText(/0x[0-9a-f]{64}/)
-  await expectCartCount(page, 0)
+  await expect(receipt.getByTestId('receipt-items')).toContainText(nftName)
+  await expect(receipt.getByTestId('receipt-items')).toContainText('(x 1)')
+  await expect(receipt.getByTestId('receipt-fee')).toHaveText(shownFee)
+  await expect(receipt.getByTestId('receipt-total')).toHaveText(shownTotal)
+  await expect(receipt).toContainText('MetaMask')
+  await expect(receipt).toContainText('Transação confirmada na Ethereum')
+  await expect(receipt.getByTestId('receipt-hash')).toHaveText(/^0x[0-9a-f]{64}$/)
+  await expect(receipt.getByRole('note')).toContainText('Transação simulada')
+  expect(await cartQuantity(page)).toBe(0)
 })
