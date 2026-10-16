@@ -17,7 +17,7 @@ import {
   settleOrderIfDue,
   toPublicOrder,
 } from '../order-logic'
-import { emitNftUpdated } from '../realtime/connections'
+import { emitNftUpdated, emitOrderUpdated } from '../realtime/connections'
 import { errorResponse, notFound, readBody, requireUser } from '../responses'
 import { consumeCheckoutTrap, getScenario } from '../scenarios'
 
@@ -167,6 +167,8 @@ export const orderHandlers = [
     db.orders.push(order)
     saveDb()
     scheduleSettlement(order)
+    // O pedido nasce pendente (versão 1); a resolução vem depois como versão 2.
+    emitOrderUpdated(order)
 
     // O pedido foi criado, mas a resposta "se perde" na rede. O retry com a
     // mesma chave encontra o pedido acima, no bloco de idempotência.

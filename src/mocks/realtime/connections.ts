@@ -19,6 +19,7 @@ export const realtimeLink = ws.link(socketUrl.replace(/^http/, 'ws'))
 
 const openConnections = new Set<OpenConnection>()
 const sentNftEvents: NftUpdatedEvent[] = []
+const sentOrderEvents: { userId: string; event: OrderUpdatedEvent }[] = []
 let offline = false
 
 // O binding responde o handshake com pingInterval de 25s, mas não manda ping.
@@ -91,11 +92,20 @@ export function emitOrderUpdated(order: StoredOrder) {
     occurredAt: new Date().toISOString(),
     data: { status: order.status, failureReason: order.failureReason },
   }
+  sentOrderEvents.push({ userId: order.userId, event })
+  sendOrderEvent(order.userId, event)
+}
+
+export function sendOrderEvent(userId: string, event: OrderUpdatedEvent) {
   for (const connection of openConnections) {
-    if (connection.userId === order.userId) {
+    if (connection.userId === userId) {
       connection.io.client.emit('order.updated', event)
     }
   }
+}
+
+export function getSentOrderEvents(orderId: string) {
+  return sentOrderEvents.filter((sent) => sent.event.resource.id === orderId)
 }
 
 export function closeConnectionsForToken(token: string) {

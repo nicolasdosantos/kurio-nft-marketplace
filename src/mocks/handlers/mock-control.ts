@@ -8,6 +8,8 @@ import { resumePendingOrders, settleOrderIfDue, toPublicOrder } from '../order-l
 import {
   emitNftUpdated,
   getSentNftEvents,
+  getSentOrderEvents,
+  sendOrderEvent,
   goOffline,
   goOnline,
   sendNftEvent,
@@ -129,6 +131,20 @@ export const mockControlHandlers = [
     }
     sendNftEvent(event)
     return HttpResponse.json(event)
+  }),
+
+  // Mesmo reenvio para order.updated (só para as conexões do dono do pedido).
+  http.post('/api/mock-control/orders/:orderId/replay-event', async ({ params, request }) => {
+    const parsed = await readBody(request, z.object({ which: z.enum(['last', 'previous']) }))
+    if (parsed.response) return parsed.response
+
+    const events = getSentOrderEvents(String(params.orderId))
+    const sent = parsed.body.which === 'last' ? events.at(-1) : events.at(-2)
+    if (!sent) {
+      return errorResponse(400, 'BAD_REQUEST', 'Ainda não há eventos suficientes para reenviar.')
+    }
+    sendOrderEvent(sent.userId, sent.event)
+    return HttpResponse.json(sent.event)
   }),
 
   http.post('/api/mock-control/realtime/offline', () => {
