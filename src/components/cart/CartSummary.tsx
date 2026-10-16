@@ -29,7 +29,7 @@ const variants = {
   },
   mobile: {
     input:
-      'flex h-[50px] items-stretch overflow-hidden rounded-[40px] border border-border bg-surface-card shadow-[0_6px_20px_rgb(10_6_4/0.45)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-accent',
+      'flex h-[50px] items-stretch overflow-hidden rounded-[40px] border border-field-border bg-surface-card shadow-[0_6px_20px_rgb(10_6_4/0.45)] focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-text-accent',
     field:
       'min-w-0 flex-1 bg-transparent pl-4 text-caption leading-[22px] text-foreground placeholder:text-secondary outline-none',
     apply:

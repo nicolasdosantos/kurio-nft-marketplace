@@ -365,7 +365,7 @@ export function CheckoutPage() {
                 disabled
                 placeholder="Em breve"
                 className={cn(
-                  'w-full border border-border bg-transparent px-3 text-body-sm placeholder:text-secondary',
+                  'w-full border border-field-border bg-transparent px-3 text-body-sm placeholder:text-secondary',
                   isTabletUp ? 'h-10 rounded-[3px]' : 'h-[50px] rounded-[10px] bg-surface-card',
                 )}
               />

@@ -62,7 +62,7 @@ function MobileSearchForm({
     <form
       role="search"
       onSubmit={handleSubmit}
-      className="flex h-[45px] flex-1 items-center gap-2 rounded-[10px] bg-surface-card px-3"
+      className="flex h-[45px] flex-1 items-center gap-2 rounded-[10px] bg-surface-card px-3 has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-text-accent"
     >
       <img src="/icons/mobile-search.svg" alt="" width={22} height={22} />
       <label htmlFor="mobile-search" className="sr-only">

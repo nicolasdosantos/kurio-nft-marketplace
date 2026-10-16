@@ -13,7 +13,7 @@ const inputStyles: Record<Variant, string> = {
 }
 
 const fieldClasses =
-  'w-full border border-border bg-transparent text-body-sm text-foreground placeholder:text-secondary focus:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-accent aria-invalid:border-destructive'
+  'w-full border border-field-border bg-transparent text-body-sm text-foreground placeholder:text-secondary focus:border-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-text-accent aria-invalid:border-destructive'
 
 export function FieldLabel({
   htmlFor,
@@ -222,7 +222,7 @@ export function EnsField({
         <span
           id={hintId}
           className={cn(
-            'flex shrink-0 items-center border border-border text-body text-foreground',
+            'flex shrink-0 items-center border border-field-border text-body text-foreground',
             variant === 'desktop'
               ? 'h-10 w-[78px] rounded-[3px] pl-3'
               : 'h-[50px] rounded-[10px] bg-surface-card px-4',

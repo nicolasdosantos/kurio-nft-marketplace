@@ -36,7 +36,7 @@ export function AuthField({
       <div
         className={cn(
           // Borda primary do Figma no foco, mais o anel de foco do app para quem usa teclado.
-          'flex items-center border border-border pr-3 focus-within:border-primary has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-text-accent',
+          'flex items-center border border-field-border pr-3 focus-within:border-primary has-[input:focus-visible]:outline-2 has-[input:focus-visible]:outline-offset-2 has-[input:focus-visible]:outline-text-accent',
           error && 'border-destructive focus-within:border-destructive',
           variants[variant],
           className,
