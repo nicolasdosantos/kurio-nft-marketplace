@@ -278,6 +278,10 @@ export function CartPage() {
           <Link to="/" className="hover:underline">
             Início
           </Link>{' '}
+          /{' '}
+          <Link to="/" hash="catalogo" className="hover:underline">
+            Mercado
+          </Link>{' '}
           / <span aria-current="page">Carrinho</span>
         </nav>
         {/* Altura de um carrinho com 3 itens: skeleton, vazio e carrinho pequeno ocupam o

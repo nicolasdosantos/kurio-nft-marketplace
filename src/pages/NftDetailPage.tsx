@@ -347,8 +347,8 @@ function NftDetailContent({ nft, isTabletUp }: { nft: Nft; isTabletUp: boolean }
             Início
           </Link>{' '}
           /{' '}
-          <Link to="/" search={{ collections: [nft.collection.slug] }} className="hover:underline">
-            {nft.collection.name}
+          <Link to="/" hash="catalogo" className="hover:underline">
+            Mercado
           </Link>
         </nav>
 

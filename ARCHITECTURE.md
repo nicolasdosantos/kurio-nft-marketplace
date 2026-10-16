@@ -155,7 +155,7 @@ Outras limitações:
 - O banco simulado fica no `localStorage` e cada aba tem a sua cópia em memória; duas abas abertas podem divergir até o refresh.
 - A API de controle existe também no deploy, porque o deploy é a demonstração.
 - O hash da transação é fictício. O recibo deixa isso claro com o aviso "Transação simulada" no lugar do link do Etherscan.
-- Itens fora do escopo aparecem desabilitados com "em breve".
+- Itens fora do escopo têm a aparência normal, com um cadeado pequeno e o tooltip "Em breve" no hover e no foco (no rodapé, só o tooltip); clicar não faz nada, e o leitor de tela ouve "(em breve)" com `aria-disabled`.
 
 ## Desvios do Figma
 
@@ -163,7 +163,7 @@ As telas seguem o Figma. Abaixo estão só os pontos em que a implementação fi
 
 ### Escopo do enunciado
 
-1. Tudo que o enunciado não pede aparece desabilitado com "em breve": Mercado, Criadores, Aprenda, newsletter e links do rodapé, blog, login social, "Esqueceu a senha?", código de indicação, o leitor de NFT da tab bar e os itens Atividade, Lista de interesse, Ofertas, Arquivos baixados e Suporte do menu da conta.
+1. Tudo que o enunciado não pede fica com o cadeado e o tooltip "Em breve": Criadores, Aprenda, newsletter e links do rodapé, blog, login social, "Esqueceu a senha?", código de indicação, o leitor de NFT da tab bar e os itens Atividade, Lista de interesse, Ofertas, Arquivos baixados e Suporte do menu da conta.
 2. O card do catálogo no desktop mostra o coração de favoritar e a rede, que o Figma não tem, porque o enunciado pede.
 3. Os formulários seguem os contratos da API. O pagamento pede só os dados do pedido (nome de exibição, usuário, e-mail e observação), e os dados da carteira aparecem nos cards Principal e Reserva. O formulário de carteiras tem só os campos de carteira. O perfil tem um botão para os dados e outro para a senha, porque são operações separadas.
 4. O comprovante mostra subtotal e desconto além de taxa e total, e no lugar de "Ver no Etherscan" tem o aviso de transação simulada, porque o hash não existe em nenhum explorer.

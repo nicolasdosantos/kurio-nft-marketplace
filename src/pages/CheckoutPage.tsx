@@ -573,8 +573,8 @@ export function CheckoutPage() {
           Início
         </Link>{' '}
         /{' '}
-        <Link to="/carrinho" className="hover:underline">
-          Carrinho
+        <Link to="/" hash="catalogo" className="hover:underline">
+          Mercado
         </Link>{' '}
         / <span aria-current="page">Pagamento</span>
       </nav>

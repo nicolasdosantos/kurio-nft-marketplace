@@ -54,7 +54,10 @@ export function SiteHeader() {
   const cartCount = useCartCount()
   const cartBump = useBumpKey(cartCount)
   const [searchOpen, setSearchOpen] = useState(false)
-  const isHome = useRouterState({ select: (state) => state.location.pathname === '/' })
+  const pathname = useRouterState({ select: (state) => state.location.pathname })
+  const isHome = pathname === '/'
+  // Como no Figma: Início ativo na home e na conta; Mercado no fluxo de compra.
+  const isMarket = /^\/(nft|carrinho|pagamento|pedidos)(\/|$)/.test(pathname)
 
   return (
     <header className="mx-auto hidden w-full max-w-[1232px] px-4 pt-6 md:block">
@@ -71,14 +74,29 @@ export function SiteHeader() {
           <Link
             to="/"
             aria-current={isHome ? 'page' : undefined}
-            className="flex w-[58px] flex-col gap-6 text-foreground aria-[current=page]:font-bold aria-[current=page]:text-text-accent"
+            className={cn(
+              'flex w-[58px] flex-col gap-6',
+              isMarket ? 'text-foreground' : 'font-bold text-text-accent',
+            )}
           >
             Início
-            {isHome && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
+            {!isMarket && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
           </Link>
-          <ComingSoon className="text-foreground">Mercado</ComingSoon>
-          <ComingSoon className="text-foreground">Criadores</ComingSoon>
-          <ComingSoon className="text-foreground">Aprenda</ComingSoon>
+          <Link
+            to="/"
+            hash="catalogo"
+            // Já na home, mantém busca e filtros; de outra tela, abre o catálogo completo.
+            search={isHome ? true : undefined}
+            className={cn(
+              'flex flex-col gap-6',
+              isMarket ? 'font-bold text-text-accent' : 'text-foreground',
+            )}
+          >
+            Mercado
+            {isMarket && <img src="/icons/nav-underline.svg" alt="" className="h-[3px] w-full" />}
+          </Link>
+          <ComingSoon className="self-start text-foreground">Criadores</ComingSoon>
+          <ComingSoon className="self-start text-foreground">Aprenda</ComingSoon>
         </nav>
 
         <div className="flex items-center gap-5 justify-self-end lg:gap-7">
