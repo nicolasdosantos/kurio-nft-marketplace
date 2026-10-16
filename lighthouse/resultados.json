@@ -1,0 +1,59 @@
+{
+  "measuredAt": "2026-10-16T14:24:36.802Z",
+  "baseUrl": "https://kurio-nft-marketplace-eta.vercel.app",
+  "runs": 3,
+  "results": [
+    {
+      "page": "Início",
+      "profile": "mobile",
+      "url": "https://kurio-nft-marketplace-eta.vercel.app/",
+      "runs": 3,
+      "performance": 96,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 2403,
+      "cls": 0,
+      "tbtMs": 67
+    },
+    {
+      "page": "Início",
+      "profile": "desktop",
+      "url": "https://kurio-nft-marketplace-eta.vercel.app/",
+      "runs": 3,
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 562,
+      "cls": 0,
+      "tbtMs": 0
+    },
+    {
+      "page": "Detalhe",
+      "profile": "mobile",
+      "url": "https://kurio-nft-marketplace-eta.vercel.app/nft/emerald-ape-042",
+      "runs": 3,
+      "performance": 91,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 3167,
+      "cls": 0,
+      "tbtMs": 46
+    },
+    {
+      "page": "Detalhe",
+      "profile": "desktop",
+      "url": "https://kurio-nft-marketplace-eta.vercel.app/nft/emerald-ape-042",
+      "runs": 3,
+      "performance": 100,
+      "accessibility": 100,
+      "bestPractices": 100,
+      "seo": 100,
+      "lcpMs": 659,
+      "cls": 0,
+      "tbtMs": 0
+    }
+  ]
+}
