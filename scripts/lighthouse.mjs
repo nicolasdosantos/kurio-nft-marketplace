@@ -49,7 +49,8 @@ for (const page of pages) {
         '--settings.chromeFlags=--headless=new',
         ...profile.flags,
       ],
-      { stdio: 'inherit', env },
+      // No Windows o pnpm é um .cmd, que o execFileSync só acha pelo shell.
+      { stdio: 'inherit', env, shell: process.platform === 'win32' },
     )
     // O lhci grava em .lighthouseci/; cada combinação vai para a própria pasta.
     mkdirSync(outputDir, { recursive: true })
