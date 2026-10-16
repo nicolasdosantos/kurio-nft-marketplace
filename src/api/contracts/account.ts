@@ -84,6 +84,8 @@ export type WalletsResponse = z.infer<typeof walletsResponseSchema>
 
 export const connectWalletRequestSchema = z.object({
   network: networkSchema,
+  // App usado para conectar; precisa ser o mesmo em que a carteira foi cadastrada.
+  walletType: walletTypeSchema.optional(),
 })
 
 export const walletConnectionSchema = z.object({

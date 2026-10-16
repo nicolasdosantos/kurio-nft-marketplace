@@ -3,77 +3,111 @@ import { useForm } from 'react-hook-form'
 import type { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { useConnectWallet, useWallets } from '@/api/account'
+import { Link, useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router'
+import { useConnectWallet, useDisconnectWallet, useWallets } from '@/api/account'
 import { useCart, useQuote } from '@/api/cart'
-import type { WalletSlot } from '@/api/contracts/account'
+import type { WalletSlot, WalletType } from '@/api/contracts/account'
 import type { Quote } from '@/api/contracts/cart'
 import { createOrderRequestSchema, type CreateOrderRequest } from '@/api/contracts/orders'
-import { ApiRequestError } from '@/api/errors'
-import { useCreateOrder } from '@/api/orders'
+import { isRetryableError } from '@/api/errors'
+import { useCreateOrder, useOrder } from '@/api/orders'
 import { queryKeys } from '@/api/query-keys'
+import { CheckoutField, CheckoutTextarea, FieldLabel } from '@/components/checkout/CheckoutField'
+import { CheckoutItems } from '@/components/checkout/CheckoutItems'
+import {
+  NoResponse,
+  OrderPending,
+  PaymentDeclined,
+  QuoteChanges,
+} from '@/components/checkout/CheckoutPanels'
+import { ProviderOptions, WalletCards, WalletStatus } from '@/components/checkout/WalletPicker'
+import { ComingSoon } from '@/components/layout/ComingSoon'
+import { Skeleton } from '@/components/ui/skeleton'
 import {
   clearCheckoutAttempt,
   readCheckoutAttempt,
   saveCheckoutAttempt,
 } from '@/lib/checkout-attempt'
+import { walletSlotLabels, walletTypeLabels } from '@/lib/display'
+import { describeQuoteChanges, sameQuote } from '@/lib/quote-changes'
+import { useMediaQuery } from '@/lib/use-media-query'
+import { cn } from '@/lib/utils'
 import { cacheOwner, useSession } from '@/session/session-store'
 
 const collectorSchema = createOrderRequestSchema.shape.collector
 type CollectorForm = z.input<typeof collectorSchema>
 
-// O que o usuário revisou: se algo disso mudar, ele precisa confirmar de novo.
-function sameQuote(reviewed: Quote, current: Quote) {
-  return (
-    reviewed.valid === current.valid &&
-    reviewed.totalEth === current.totalEth &&
-    reviewed.networkFeeEth === current.networkFeeEth &&
-    reviewed.discountEth === current.discountEth &&
-    reviewed.lines.length === current.lines.length &&
-    reviewed.lines.every((line) => {
-      const match = current.lines.find((item) => item.itemId === line.itemId)
-      return (
-        match !== undefined &&
-        match.quantity === line.quantity &&
-        match.unitPriceEth === line.unitPriceEth &&
-        match.issues.join() === line.issues.join()
-      )
-    })
-  )
-}
+const CONNECT_BUTTON_ID = 'checkout-connect'
+const CONFIRM_BUTTON_ID = 'checkout-confirm'
 
-function changedMessage(quote: Quote) {
-  return `Preço, estoque ou taxas mudaram. O novo total é ${quote.totalEth} ETH. Confira e confirme de novo.`
-}
+const collectorFields = [
+  { name: 'displayName', label: 'Nome de exibição', autoComplete: 'name', type: 'text' },
+  { name: 'username', label: 'Nome de usuário', autoComplete: 'username', type: 'text' },
+  { name: 'email', label: 'E-mail', autoComplete: 'email', type: 'email' },
+] as const
 
 export function CheckoutPage() {
   const session = useSession()
   const userId = session.user?.id ?? ''
   const queryClient = useQueryClient()
   const navigate = useNavigate()
+  const router = useRouter()
+  const canGoBack = useCanGoBack()
+  const isTabletUp = useMediaQuery('(min-width: 768px)')
+  const variant = isTabletUp ? 'desktop' : 'mobile'
+
   const cartQuery = useCart()
   const walletsQuery = useWallets()
   const connectWallet = useConnectWallet()
+  const disconnectWallet = useDisconnectWallet()
   const createOrder = useCreateOrder()
 
-  const [walletSlot, setWalletSlot] = useState<WalletSlot>('primary')
-  const [connectedSlot, setConnectedSlot] = useState<WalletSlot | null>(null)
-  // A cotação que o usuário viu na revisão; null enquanto ainda está preenchendo os dados.
-  const [reviewedQuote, setReviewedQuote] = useState<Quote | null>(null)
-  const [revalidating, setRevalidating] = useState(false)
-  const [quoteChangedMessage, setQuoteChangedMessage] = useState('')
+  // Refresh no meio do envio: a tentativa guardada é reenviada ao abrir a página.
+  const [pendingAttempt] = useState(() => readCheckoutAttempt(userId))
 
+  const [walletSlot, setWalletSlot] = useState<WalletSlot>(
+    pendingAttempt?.order.walletSlot ?? 'primary',
+  )
   const wallet = walletsQuery.data?.[walletSlot] ?? null
+  // O app de conexão começa no app em que a carteira foi cadastrada.
+  const [providerChoice, setProviderChoice] = useState<WalletType | null>(null)
+  const provider = providerChoice ?? wallet?.walletType ?? null
+  const [connection, setConnection] = useState<{ slot: WalletSlot; provider: WalletType } | null>(
+    null,
+  )
+  const connected = connection?.slot === walletSlot && connection.provider === provider
+  const [walletMessage, setWalletMessage] = useState('')
+
   const network = wallet?.network ?? 'ethereum'
-  const hasItems = (cartQuery.data?.items.length ?? 0) > 0
+  const items = cartQuery.data?.items ?? []
+  const hasItems = items.length > 0
   const quoteQuery = useQuote(network, hasItems)
   const quote = quoteQuery.data
-  const reviewing = reviewedQuote !== null
-  // Um nft.updated pode refazer a cotação no meio da revisão: aí o total exibido muda
-  // e a confirmação anterior deixa de valer.
-  const changedWhileReviewing =
-    reviewedQuote !== null && quote !== undefined && !sameQuote(reviewedQuote, quote)
-  const submitting = revalidating || createOrder.isPending
+
+  const [orderId, setOrderId] = useState<string | null>(null)
+  const orderQuery = useOrder(orderId)
+  const orderStatus = orderQuery.data?.status
+  // Pedido criado e ainda não recusado: a tela fica travada até ele se resolver.
+  const orderInProgress = orderId !== null && orderStatus !== 'declined'
+
+  // A cotação que o usuário está vendo e vai confirmar. Ao trocar de carteira (e de rede)
+  // a nova cotação vira a revisada; mudanças vindas de fora (socket, revalidação) não.
+  const [reviewedQuote, setReviewedQuote] = useState<Quote | null>(null)
+  if (quote && (reviewedQuote === null || reviewedQuote.network !== quote.network)) {
+    setReviewedQuote(quote)
+  }
+  const quoteChanged =
+    !orderInProgress &&
+    reviewedQuote !== null &&
+    quote !== undefined &&
+    reviewedQuote.network === quote.network &&
+    !sameQuote(reviewedQuote, quote)
+  const changes = quoteChanged ? describeQuoteChanges(reviewedQuote, quote, items) : []
+
+  const [revalidating, setRevalidating] = useState(false)
+  const [notice, setNotice] = useState('')
+  const locked = revalidating || createOrder.isPending || orderInProgress
+  const noResponse = createOrder.isError && isRetryableError(createOrder.error)
 
   const form = useForm<CollectorForm>({
     resolver: zodResolver(collectorSchema),
@@ -85,46 +119,53 @@ export function CheckoutPage() {
     },
     resetOptions: { keepDirtyValues: true },
   })
+  const { errors } = form.formState
 
   function sendOrder(idempotencyKey: string, order: CreateOrderRequest) {
+    setNotice('')
     saveCheckoutAttempt({ userId, idempotencyKey, order })
     createOrder.mutate(
       { idempotencyKey, order },
       {
         onSuccess: (createdOrder) => {
           saveCheckoutAttempt({ userId, idempotencyKey, order, orderId: createdOrder.id })
-          navigate({ to: '/pedidos/$orderId', params: { orderId: createdOrder.id } })
+          setOrderId(createdOrder.id)
         },
         onError: (error) => {
-          if (!(error instanceof ApiRequestError)) return
-          // Erro de rede depois das tentativas: a tentativa fica guardada para retomar
-          // com a mesma chave. Qualquer resposta do servidor encerra esta tentativa.
-          if (error.status !== 0) clearCheckoutAttempt()
+          // Sem resposta (rede, timeout, 5xx): a tentativa fica guardada e o "Tentar de
+          // novo" reenvia com a mesma chave. Qualquer outra resposta encerra a tentativa.
+          if (isRetryableError(error)) return
+          clearCheckoutAttempt()
           const details = error.details as { quote?: Quote } | undefined
           if (
             (error.code === 'QUOTE_OUTDATED' || error.code === 'OUT_OF_STOCK') &&
             details?.quote
           ) {
+            // A cotação nova entra no cache; se for diferente da revisada, o aviso de
+            // mudanças aparece e pede nova confirmação.
             queryClient.setQueryData(
               queryKeys.quote(cacheOwner(session), details.quote.network),
               details.quote,
             )
             queryClient.invalidateQueries({ queryKey: queryKeys.cart(cacheOwner(session)) })
-            setReviewedQuote(details.quote)
-            setQuoteChangedMessage(changedMessage(details.quote))
+            if (reviewedQuote && sameQuote(reviewedQuote, details.quote)) setNotice(error.message)
+            return
           }
-          if (error.code === 'WALLET_DISCONNECTED') setConnectedSlot(null)
-          for (const [field, message] of Object.entries(error.fields)) {
+          if (error.code === 'WALLET_DISCONNECTED') {
+            setConnection(null)
+            setNotice('A carteira desconectou antes do envio. Conecte de novo e confirme a compra.')
+            return
+          }
+          const fieldErrors = Object.entries(error.fields)
+          for (const [field, message] of fieldErrors) {
             form.setError(field.replace('collector.', '') as keyof CollectorForm, { message })
           }
+          if (fieldErrors.length === 0) setNotice(error.message)
         },
       },
     )
   }
 
-  // Refresh no meio do envio: reenvia a mesma tentativa (mesma chave e mesmo corpo).
-  // O servidor devolve o pedido que já existia; se o primeiro envio nem chegou, cria agora.
-  const [pendingAttempt] = useState(() => readCheckoutAttempt(userId))
   const resumed = useRef(false)
   useEffect(() => {
     if (resumed.current || !pendingAttempt) return
@@ -133,42 +174,83 @@ export function CheckoutPage() {
     // sendOrder só é chamado uma vez, ao abrir a página.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingAttempt])
-  const resumeMessage =
-    pendingAttempt && createOrder.isPending ? 'Retomando a compra que estava em andamento...' : ''
+
+  // Pedido resolvido (socket ou consulta a cada 3s): confirmado abre o recibo; recusado
+  // fica aqui, com o caminho de volta. Em nenhum dos dois a tentativa precisa ser guardada.
+  useEffect(() => {
+    if (!orderId) return
+    if (orderStatus === 'confirmed') {
+      navigate({ to: '/pedidos/$orderId', params: { orderId }, replace: true })
+    } else if (orderStatus === 'declined') {
+      clearCheckoutAttempt()
+    }
+  }, [orderId, orderStatus, navigate])
+
+  function selectWallet(slot: WalletSlot) {
+    setWalletSlot(slot)
+    setProviderChoice(null)
+    setWalletMessage('')
+    connectWallet.reset()
+  }
+
+  function selectProvider(type: WalletType) {
+    setProviderChoice(type)
+    setWalletMessage('')
+    connectWallet.reset()
+  }
 
   function handleConnect() {
-    if (!wallet) return
+    if (!wallet || !provider) return
+    const slot = walletSlot
+    setNotice('')
+    setWalletMessage(`Aguardando a aprovação no ${walletTypeLabels[provider]}...`)
     connectWallet.mutate(
-      { slot: walletSlot, network: wallet.network },
-      { onSuccess: () => setConnectedSlot(walletSlot) },
+      { slot, network: wallet.network, walletType: provider },
+      {
+        onSuccess: () => {
+          setConnection({ slot, provider })
+          setWalletMessage(
+            `Carteira ${walletSlotLabels[slot]} conectada pelo ${walletTypeLabels[provider]}.`,
+          )
+        },
+        onError: () => setWalletMessage(''),
+      },
     )
   }
 
-  function startReview() {
-    if (!quote) return
-    setQuoteChangedMessage('')
-    setReviewedQuote(quote)
-  }
-
-  function acceptNewQuote() {
-    if (!quote) return
-    setQuoteChangedMessage('')
-    setReviewedQuote(quote)
+  function handleDisconnect() {
+    const slot = walletSlot
+    disconnectWallet.mutate(slot, {
+      onSuccess: () => {
+        setConnection(null)
+        setWalletMessage(`Carteira ${walletSlotLabels[slot]} desconectada.`)
+      },
+    })
   }
 
   async function confirmPurchase(collector: CollectorForm) {
-    if (!reviewedQuote || submitting) return
-    setQuoteChangedMessage('')
+    if (locked || !reviewedQuote) return
+    setNotice('')
+    if (!wallet) {
+      setNotice('Cadastre uma carteira para pagar.')
+      return
+    }
+    if (!connected) {
+      setNotice('Conecte a carteira antes de confirmar a compra.')
+      document.getElementById(CONNECT_BUTTON_ID)?.focus()
+      return
+    }
     // Revalida a cotação na API antes de confirmar: preço, estoque, cupom e taxas.
     setRevalidating(true)
     const fresh = await quoteQuery.refetch()
     setRevalidating(false)
-    if (!fresh.data) return
-    if (!fresh.data.valid || !sameQuote(reviewedQuote, fresh.data)) {
-      setReviewedQuote(fresh.data)
-      setQuoteChangedMessage(changedMessage(fresh.data))
+    if (!fresh.data) {
+      setNotice('Não foi possível conferir o total agora. Tente de novo.')
       return
     }
+    // Mudou: o aviso de mudanças aparece e o botão passa a pedir a nova revisão.
+    if (!fresh.data.valid || !sameQuote(reviewedQuote, fresh.data)) return
+
     // Uma chave nova por tentativa de compra; os retries automáticos usam a mesma.
     sendOrder(crypto.randomUUID(), {
       quoteId: fresh.data.id,
@@ -178,181 +260,355 @@ export function CheckoutPage() {
     })
   }
 
-  if (cartQuery.isPending || walletsQuery.isPending) {
-    return <main className="p-4">Carregando pagamento...</main>
+  function acceptNewQuote() {
+    if (!quote) return
+    setReviewedQuote(quote)
+    setNotice('')
+    setWalletMessage('Novo total aceito. Confirme a compra para continuar.')
   }
-  if (!hasItems && !createOrder.isPending && !pendingAttempt) {
-    return (
-      <main className="p-4">
-        Seu carrinho está vazio.{' '}
-        <Link to="/" className="underline">
+
+  function retrySameAttempt() {
+    const attempt = readCheckoutAttempt(userId)
+    if (attempt) sendOrder(attempt.idempotencyKey, attempt.order)
+  }
+
+  function retryAfterDecline() {
+    setOrderId(null)
+    createOrder.reset()
+    setNotice('')
+    if (quote) setReviewedQuote(quote)
+    requestAnimationFrame(() => document.getElementById(CONFIRM_BUTTON_ID)?.focus())
+  }
+
+  function handleBack() {
+    if (canGoBack) router.history.back()
+    else navigate({ to: '/carrinho' })
+  }
+
+  const statusMessage =
+    pendingAttempt && createOrder.isPending
+      ? 'Retomando a compra que estava em andamento...'
+      : revalidating
+        ? 'Conferindo preço, estoque e taxas...'
+        : walletMessage
+
+  const loading = cartQuery.isPending || walletsQuery.isPending
+  const empty = !loading && !hasItems && orderId === null && !pendingAttempt
+
+  let content
+  if (loading) {
+    content = <CheckoutSkeleton variant={variant} />
+  } else if (cartQuery.isError || walletsQuery.isError) {
+    content = (
+      <div role="alert" className="flex flex-col items-start gap-3 rounded-lg bg-surface-card p-6">
+        <p className="text-body-md font-bold">Não foi possível carregar o pagamento.</p>
+        <button
+          type="button"
+          onClick={() => {
+            cartQuery.refetch()
+            walletsQuery.refetch()
+          }}
+          className="h-10 rounded-[6px] bg-primary px-4 text-body-sm font-bold text-ink"
+        >
+          Tentar de novo
+        </button>
+      </div>
+    )
+  } else if (empty) {
+    content = (
+      <div className="flex flex-col items-center gap-4 rounded-lg bg-surface-card px-6 py-12 text-center">
+        <p className="text-body-md font-bold">Seu carrinho está vazio.</p>
+        <Link
+          to="/"
+          className="flex h-10 items-center rounded-[6px] bg-primary px-5 text-body-sm font-bold text-ink hover:bg-text-accent"
+        >
           Explorar o mercado
         </Link>
+      </div>
+    )
+  } else {
+    const wallets = walletsQuery.data!
+
+    const collectorSection = (
+      <section aria-labelledby="collector-title" className="flex flex-col gap-3">
+        <h2
+          id="collector-title"
+          className={cn(
+            'font-bold',
+            isTabletUp ? 'text-[17px] leading-4' : 'text-body-md leading-4',
+          )}
+        >
+          Perfil do colecionador
+        </h2>
+        <fieldset disabled={locked} className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+          {collectorFields.map((field) => (
+            <CheckoutField
+              key={field.name}
+              id={`checkout-${field.name}`}
+              label={field.label}
+              variant={variant}
+              type={field.type}
+              autoComplete={field.autoComplete}
+              required
+              error={errors[field.name]?.message}
+              {...form.register(field.name)}
+            />
+          ))}
+          {/* Programa de indicação fora do escopo. */}
+          <div className="flex flex-col">
+            <FieldLabel htmlFor="checkout-referral">Código de indicação</FieldLabel>
+            <ComingSoon className="block">
+              <input
+                id="checkout-referral"
+                disabled
+                placeholder="Em breve"
+                className={cn(
+                  'w-full border border-border bg-transparent px-3 text-body-sm placeholder:text-secondary',
+                  isTabletUp ? 'h-10 rounded-[3px]' : 'h-[50px] rounded-[10px] bg-surface-card',
+                )}
+              />
+            </ComingSoon>
+          </div>
+        </fieldset>
+      </section>
+    )
+
+    const walletSection = wallets.primary ? (
+      <section aria-labelledby="wallet-status" className="flex flex-col gap-4">
+        <WalletStatus
+          connected={connected}
+          connecting={connectWallet.isPending}
+          disconnecting={disconnectWallet.isPending}
+          canConnect={provider !== null}
+          locked={locked}
+          onConnect={handleConnect}
+          onDisconnect={handleDisconnect}
+          connectButtonId={CONNECT_BUTTON_ID}
+        />
+        <WalletCards
+          variant={variant}
+          wallets={wallets}
+          selected={walletSlot}
+          disabled={locked}
+          onSelect={selectWallet}
+        />
+      </section>
+    ) : (
+      <section className="flex flex-col items-start gap-3 rounded-[14px] bg-surface-card p-5">
+        <h2 className="text-body-md leading-4 font-bold">Nenhuma carteira cadastrada</h2>
+        <p className="text-body-sm text-text-secondary">Cadastre uma carteira para pagar.</p>
+        <Link to="/carteiras" className="text-body-sm font-bold text-text-accent underline">
+          Cadastrar carteira
+        </Link>
+      </section>
+    )
+
+    const noteField = (
+      <CheckoutTextarea
+        id="checkout-note"
+        label="Observação do colecionador (opcional)"
+        variant={variant}
+        disabled={locked}
+        error={errors.note?.message}
+        className={isTabletUp ? 'max-w-[350px]' : undefined}
+        {...form.register('note')}
+      />
+    )
+
+    const providers = wallets.primary && (
+      <ProviderOptions
+        variant={variant}
+        selected={provider}
+        disabled={locked}
+        onSelect={selectProvider}
+      />
+    )
+
+    // O resumo mostra sempre a cotação atual; se ela mudou, o aviso diz o quê.
+    const itemsSection = (
+      <CheckoutItems
+        variant={variant}
+        items={items}
+        quote={quote}
+        updating={quoteQuery.isFetching}
+      />
+    )
+
+    const actionStyle = isTabletUp
+      ? 'h-[45px] rounded-[8px] bg-primary text-body hover:bg-text-accent'
+      : 'h-[60px] rounded-[40px] bg-[linear-gradient(135deg,var(--color-primary),rgb(210_138_76/0.8))] text-body'
+    const actionClass = cn(
+      'flex w-full items-center justify-center px-4 leading-4 font-bold text-ink disabled:opacity-60',
+      actionStyle,
+    )
+
+    let action
+    if (orderInProgress) {
+      action = <OrderPending status={orderStatus} />
+    } else if (orderStatus === 'declined') {
+      action = (
+        <PaymentDeclined
+          reason={orderQuery.data?.failureReason ?? null}
+          onRetry={retryAfterDecline}
+        />
+      )
+    } else if (noResponse) {
+      action = <NoResponse onRetry={retrySameAttempt} />
+    } else if (quote && !quote.valid) {
+      action = (
+        <Link to="/carrinho" className={actionClass}>
+          Ajustar no carrinho
+        </Link>
+      )
+    } else if (quoteChanged) {
+      action = (
+        // key diferente do "Confirmar compra": se o React reaproveitasse o mesmo <button>,
+        // ele viraria type="submit" no meio do clique e o formulário seria enviado.
+        <button key="accept" type="button" onClick={acceptNewQuote} className={actionClass}>
+          Revisar novo total
+        </button>
+      )
+    } else {
+      action = (
+        <button
+          key="confirm"
+          id={CONFIRM_BUTTON_ID}
+          type="submit"
+          disabled={locked || !quote}
+          aria-busy={locked}
+          className={actionClass}
+        >
+          {locked ? 'Confirmando...' : 'Confirmar compra'}
+        </button>
+      )
+    }
+
+    const feedback = (
+      <>
+        {quoteChanged && <QuoteChanges changes={changes} valid={quote?.valid ?? true} />}
+        <p
+          role="status"
+          data-testid="checkout-status"
+          className="text-body-sm text-text-accent empty:sr-only"
+        >
+          {statusMessage}
+        </p>
+        <p role="alert" className="text-body-sm text-destructive empty:sr-only">
+          {notice ||
+            connectWallet.error?.message ||
+            disconnectWallet.error?.message ||
+            (quoteQuery.isError ? quoteQuery.error.message : '')}
+        </p>
+        {action}
+      </>
+    )
+
+    content = (
+      <form
+        noValidate
+        onSubmit={form.handleSubmit(confirmPurchase)}
+        className={
+          isTabletUp
+            ? 'grid gap-12 lg:grid-cols-[minmax(0,763px)_405px] lg:justify-between lg:gap-8'
+            : 'flex flex-col gap-4'
+        }
+      >
+        {isTabletUp ? (
+          <>
+            <div className="flex min-w-0 flex-col gap-6">
+              {collectorSection}
+              {walletSection}
+              {noteField}
+            </div>
+            <div className="flex min-w-0 flex-col gap-3">
+              {itemsSection}
+              <div className="mt-3 flex flex-col gap-6">
+                {providers}
+                {feedback}
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            {walletSection}
+            {providers}
+            {itemsSection}
+            {collectorSection}
+            {noteField}
+            <div className="mt-4 flex flex-col gap-4">{feedback}</div>
+          </>
+        )}
+      </form>
+    )
+  }
+
+  if (!isTabletUp) {
+    return (
+      <main className="mx-auto flex w-full max-w-[414px] flex-col gap-4 px-7 pt-8 pb-12">
+        <div className="flex h-11 items-start gap-6">
+          <button
+            type="button"
+            aria-label="Voltar"
+            onClick={handleBack}
+            className="grid size-[35px] shrink-0 place-items-center rounded-full border border-border bg-surface-raised"
+          >
+            <img src="/icons/arrow-left.svg" alt="" width={20} height={20} />
+          </button>
+          <h1 className="pt-[9px] text-[20px] leading-4 font-bold">Pagamento com carteira</h1>
+        </div>
+        {content}
       </main>
     )
   }
 
-  const { errors } = form.formState
-  const walletReady = wallet !== null && connectedSlot === walletSlot
-  const shownQuote = reviewedQuote ?? quote
-
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-4 p-4">
-      <h1 className="text-heading font-bold">Pagamento</h1>
-
-      <form noValidate onSubmit={form.handleSubmit(startReview)} className="flex flex-col gap-3">
-        <h2 className="font-bold">Perfil do colecionador</h2>
-        {(
-          [
-            ['displayName', 'Nome de exibição'],
-            ['username', 'Nome de usuário'],
-            ['email', 'E-mail'],
-          ] as const
-        ).map(([field, label]) => (
-          <div key={field} className="flex flex-col">
-            <label htmlFor={`checkout-${field}`}>{label}</label>
-            <input
-              id={`checkout-${field}`}
-              {...form.register(field)}
-              aria-invalid={errors[field] ? true : undefined}
-              aria-describedby={errors[field] ? `checkout-${field}-error` : undefined}
-              className="rounded border border-input bg-ink p-1"
-            />
-            {errors[field] && (
-              <span id={`checkout-${field}-error`} className="text-destructive">
-                {errors[field].message}
-              </span>
-            )}
-          </div>
-        ))}
-        <label htmlFor="checkout-note">Observação do colecionador (opcional)</label>
-        <textarea
-          id="checkout-note"
-          {...form.register('note')}
-          className="rounded border border-input bg-ink p-1"
-        />
-
-        <h2 className="font-bold">Carteira e rede</h2>
-        {!walletsQuery.data?.primary && (
-          <p>
-            Você ainda não tem carteira.{' '}
-            <Link to="/carteiras" className="underline">
-              Cadastrar carteira
-            </Link>
-          </p>
-        )}
-        {(['primary', 'secondary'] as const).map((slot) => {
-          const slotWallet = walletsQuery.data?.[slot]
-          if (!slotWallet) return null
-          return (
-            <label key={slot} className="flex gap-2">
-              <input
-                type="radio"
-                name="wallet"
-                checked={walletSlot === slot}
-                onChange={() => {
-                  setWalletSlot(slot)
-                  setReviewedQuote(null)
-                }}
-              />
-              {slotWallet.nickname} ({slotWallet.walletType}, {slotWallet.network})
-            </label>
-          )
-        })}
-        {wallet && (
-          <div className="flex items-center gap-2">
-            <span data-testid="wallet-status">
-              {walletReady ? 'Carteira conectada' : 'Carteira desconectada'}
-            </span>
-            {!walletReady && (
-              <button
-                type="button"
-                onClick={handleConnect}
-                disabled={connectWallet.isPending}
-                className="rounded border border-primary px-2"
-              >
-                Conectar carteira
-              </button>
-            )}
-          </div>
-        )}
-        {connectWallet.isError && (
-          <p role="alert" className="text-destructive">
-            {connectWallet.error.message}
-          </p>
-        )}
-
-        {!reviewing && (
-          <button
-            type="submit"
-            disabled={!walletReady || !quote}
-            className="rounded bg-primary p-2 text-primary-foreground disabled:opacity-50"
-          >
-            Revisar pedido
-          </button>
-        )}
-      </form>
-
-      <section aria-label="Resumo do pedido" className="flex flex-col gap-1">
-        {quoteQuery.isPending && <p>Calculando total...</p>}
-        {shownQuote && (
-          <dl className="grid grid-cols-2 gap-1" data-testid="checkout-summary">
-            <dt>Subtotal</dt>
-            <dd>{shownQuote.subtotalEth} ETH</dd>
-            <dt>Desconto</dt>
-            <dd>(-) {shownQuote.discountEth} ETH</dd>
-            <dt>Taxa de rede</dt>
-            <dd>{shownQuote.networkFeeEth} ETH</dd>
-            <dt className="font-bold">Total</dt>
-            <dd className="font-bold" data-testid="checkout-total">
-              {shownQuote.totalEth} ETH
-            </dd>
-          </dl>
-        )}
-      </section>
-
-      <div role="status" aria-live="polite" data-testid="checkout-status">
-        {resumeMessage && <p>{resumeMessage}</p>}
-        {quoteChangedMessage && <p className="text-text-accent">{quoteChangedMessage}</p>}
-        {!quoteChangedMessage && changedWhileReviewing && quote && (
-          <p className="text-text-accent">{changedMessage(quote)}</p>
-        )}
-      </div>
-      {createOrder.isError && !quoteChangedMessage && (
-        <p role="alert" className="text-destructive">
-          {createOrder.error.message}
-        </p>
-      )}
-
-      {reviewing && (
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={() => setReviewedQuote(null)}
-            className="rounded border px-3 py-1"
-          >
-            Editar dados
-          </button>
-          {changedWhileReviewing ? (
-            <button
-              type="button"
-              onClick={acceptNewQuote}
-              className="rounded bg-primary px-3 py-1 text-primary-foreground"
-            >
-              Revisar novo total
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={submitting || !reviewedQuote.valid || !walletReady}
-              onClick={form.handleSubmit(confirmPurchase)}
-              className="rounded bg-primary px-3 py-1 text-primary-foreground disabled:opacity-50"
-            >
-              {submitting ? 'Enviando...' : 'Confirmar compra'}
-            </button>
-          )}
-        </div>
-      )}
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-8">
+      <h1 className="sr-only">Pagamento</h1>
+      <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
+        <Link to="/" className="hover:underline">
+          Início
+        </Link>{' '}
+        /{' '}
+        <Link to="/carrinho" className="hover:underline">
+          Carrinho
+        </Link>{' '}
+        / <span aria-current="page">Pagamento</span>
+      </nav>
+      {content}
     </main>
+  )
+}
+
+function CheckoutSkeleton({ variant }: { variant: 'desktop' | 'mobile' }) {
+  if (variant === 'mobile') {
+    return (
+      <div aria-busy="true" aria-label="Carregando pagamento" className="flex flex-col gap-4">
+        <Skeleton className="h-4 w-48" />
+        <Skeleton className="h-[93px] rounded-[14px]" />
+        <Skeleton className="h-[93px] rounded-[14px]" />
+        <Skeleton className="h-[65px] rounded-[15px]" />
+        <Skeleton className="h-[65px] rounded-[15px]" />
+        <Skeleton className="h-[65px] rounded-[15px]" />
+      </div>
+    )
+  }
+  return (
+    <div
+      aria-busy="true"
+      aria-label="Carregando pagamento"
+      className="grid gap-12 lg:grid-cols-[minmax(0,763px)_405px] lg:justify-between lg:gap-8"
+    >
+      <div className="flex flex-col gap-6">
+        <Skeleton className="h-[200px]" />
+        <Skeleton className="h-[140px]" />
+        <Skeleton className="h-[179px] max-w-[350px]" />
+      </div>
+      <div className="flex flex-col gap-3">
+        <Skeleton className="h-[70px]" />
+        <Skeleton className="h-[70px]" />
+        <Skeleton className="h-[180px]" />
+        <Skeleton className="h-[236px]" />
+      </div>
+    </div>
   )
 }

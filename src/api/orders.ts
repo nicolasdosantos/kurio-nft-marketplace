@@ -19,15 +19,16 @@ export function useOrders() {
   })
 }
 
-export function useOrder(orderId: string) {
+// null: ainda não há pedido (ex.: pagamento antes de confirmar).
+export function useOrder(orderId: string | null) {
   const session = useSession()
   return useQuery({
-    queryKey: queryKeys.order(cacheOwner(session), orderId),
+    queryKey: queryKeys.order(cacheOwner(session), orderId ?? ''),
     queryFn: async ({ signal }) => {
       const response = await http.get<Order>(`/orders/${orderId}`, { signal })
       return response.data
     },
-    enabled: session.user !== null,
+    enabled: session.user !== null && orderId !== null,
     // O order.updated chega pelo socket; isso só cobre o caso de o evento se perder.
     refetchInterval: (query) =>
       query.state.data?.status === 'pending' ? PENDING_REFETCH_MS : false,

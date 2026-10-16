@@ -1,3 +1,4 @@
+import type { WalletSlot, WalletType } from '@/api/contracts/account'
 import type { Network } from '@/api/contracts/common'
 import type { Rarity } from '@/api/contracts/nfts'
 
@@ -5,6 +6,17 @@ export const networkLabels: Record<Network, string> = {
   ethereum: 'Ethereum',
   polygon: 'Polygon',
   solana: 'Solana',
+}
+
+export const walletTypeLabels: Record<WalletType, string> = {
+  metamask: 'MetaMask',
+  walletconnect: 'WalletConnect',
+  coinbase: 'Coinbase Wallet',
+}
+
+export const walletSlotLabels: Record<WalletSlot, string> = {
+  primary: 'Principal',
+  secondary: 'Reserva',
 }
 
 export const rarityLabels: Record<Rarity, string> = {

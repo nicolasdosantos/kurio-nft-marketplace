@@ -8,6 +8,7 @@ import {
   walletSlotSchema,
   type WalletSlot,
 } from '@/api/contracts/account'
+import { walletTypeLabels } from '@/lib/display'
 import { getDb, saveDb, toPublicUser } from '../db'
 import { hashPassword } from '../password'
 import { errorResponse, notFound, readBody, requireUser } from '../responses'
@@ -150,6 +151,14 @@ export const accountHandlers = [
       return errorResponse(422, 'VALIDATION_ERROR', 'Esta carteira é de outra rede.', {
         fields: { network: 'Esta carteira é de outra rede.' },
       })
+    }
+    const { walletType } = parsed.body
+    if (walletType && walletType !== wallet.walletType) {
+      return errorResponse(
+        409,
+        'WALLET_REJECTED',
+        `Esta carteira está no ${walletTypeLabels[wallet.walletType]}. Conecte por ele ou escolha outra carteira.`,
+      )
     }
     if (getScenario().name === 'wallet-rejected') {
       return errorResponse(409, 'WALLET_REJECTED', 'A conexão foi recusada na carteira.')

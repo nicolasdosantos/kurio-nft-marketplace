@@ -17,6 +17,8 @@
   --color-text-secondary: #cfb28c;
   --color-foreground: #f5f1eb;
   --color-background-elevated: #fbfbfb;
+  /* Asterisco dos campos obrigatórios no pagamento. */
+  --color-required: #f0805f;
 
   --font-sans: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   --font-mono: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;

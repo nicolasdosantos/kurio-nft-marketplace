@@ -36,7 +36,10 @@ function RootLayout() {
   const hideTabBar = useRouterState({
     select: (state) => {
       const { pathname } = state.location
-      return pathname.startsWith('/nft/') || ['/carrinho', '/login', '/cadastro'].includes(pathname)
+      return (
+        pathname.startsWith('/nft/') ||
+        ['/carrinho', '/pagamento', '/login', '/cadastro'].includes(pathname)
+      )
     },
   })
 

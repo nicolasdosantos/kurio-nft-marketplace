@@ -7,6 +7,7 @@ import type {
   WalletConnection,
   WalletSlot,
   WalletsResponse,
+  WalletType,
 } from './contracts/account'
 import type { User } from './contracts/auth'
 import type { Network } from './contracts/common'
@@ -108,8 +109,19 @@ export function useRemoveSecondaryWallet() {
 
 export function useConnectWallet() {
   return useMutation({
-    mutationFn: async ({ slot, network }: { slot: WalletSlot; network: Network }) => {
-      const response = await http.post<WalletConnection>(`/wallets/${slot}/connect`, { network })
+    mutationFn: async ({
+      slot,
+      network,
+      walletType,
+    }: {
+      slot: WalletSlot
+      network: Network
+      walletType: WalletType
+    }) => {
+      const response = await http.post<WalletConnection>(`/wallets/${slot}/connect`, {
+        network,
+        walletType,
+      })
       return response.data
     },
   })
