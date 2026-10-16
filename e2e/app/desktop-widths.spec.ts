@@ -62,8 +62,19 @@ async function expectCleanHeader(page: Page, label: string) {
   expect(overlaps, `${label}: sobreposição no header`).toEqual([])
 }
 
+// Com centenas de navegações seguidas, às vezes a anterior ainda está terminando e o
+// Chromium aborta a nova (ERR_ABORTED). Tenta de novo uma vez só nesse caso.
+async function goto(page: Page, path: string) {
+  try {
+    await page.goto(path)
+  } catch (error) {
+    if (!String(error).includes('ERR_ABORTED')) throw error
+    await page.goto(path)
+  }
+}
+
 async function checkScreen(page: Page, width: number, screen: string, path: string, ready: string) {
-  await page.goto(path)
+  await goto(page, path)
   await page.locator(ready).first().waitFor({ state: 'attached' })
   await page.waitForTimeout(300)
   await expectNoHorizontalScroll(page, width, screen)
