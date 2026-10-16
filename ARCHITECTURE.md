@@ -159,6 +159,12 @@ O favorito muda na hora (`onMutate` grava o novo estado e guarda o anterior); se
 - **Acessibilidade:** axe (WCAG 2.1 A/AA) em 23 estados por viewport (carregando, erro, vazio, preenchido, diálogos abertos); compra completa só pelo teclado; foco preso e devolvido nos diálogos; `prefers-reduced-motion`; nenhuma tela com rolagem horizontal em 320, 390, 768 e 1440.
 - **Relatórios:** relatório HTML e, nas falhas, trace e captura (`trace: 'retain-on-failure'`).
 
+## Animações
+
+As animações existem para o site não parecer estático, sem chamar atenção. O conteúdo que chega depois do skeleton entra com um fade e uma subida de 12px, e nas listas (catálogo, carrossel, carrinho, itens do pagamento) os itens entram um depois do outro, com 50 ms de diferença. As seções abaixo da dobra, como promoções, blog, carrosséis, abas do detalhe e o rodapé, começam invisíveis e entram quando aparecem na tela; o que já está visível quando a página carrega não anima. Tem ainda a elevação com brilho e zoom da imagem no hover dos cards, o "pulo" do coração com um anel ao favoritar, o pulinho do contador do carrinho quando um item entra, o sublinhado que desliza entre as abas do catálogo, uma reação leve dos botões ao clique e um fade curto na troca de página.
+
+Tudo anima só `transform` e `opacity`, que não mudam o layout, por isso o CLS continua em 0. As imagens principais (o hero do Início e a imagem do Detalhe) nunca animam a entrada, porque são o LCP e precisam aparecer na hora; pelo mesmo motivo o fade de troca de página só roda a partir da primeira navegação dentro do app. Com `prefers-reduced-motion` ligado nada se mexe, e os testes visuais rodam nesse modo para as capturas ficarem estáveis.
+
 ## Performance
 
 - **Primeira pintura sem esperar a camada de mocks:** o worker do MSW e a restauração da sessão não bloqueiam a renderização; o `socket.io-client` é importado depois que os mocks estão prontos.
