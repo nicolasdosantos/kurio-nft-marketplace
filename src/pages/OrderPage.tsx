@@ -107,7 +107,7 @@ export function OrderPage({ orderId }: { orderId: string }) {
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px]">
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-8 px-4 pt-[41px] md:pt-[33px]">
       <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
         <Link to="/" className="hover:underline">
           Início

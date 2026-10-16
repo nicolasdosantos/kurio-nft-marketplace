@@ -270,8 +270,8 @@ export function CartPage() {
   }
 
   return (
-    // 41px: compensa o header do app, mais baixo que o dos frames (como no Pagamento).
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px]">
+    // No desktop, 33px abaixo da linha do header, como nos frames do Figma.
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px] md:pt-[33px]">
       <div className="flex flex-col gap-3">
         <h1 className="sr-only">Carrinho de NFTs</h1>
         <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">

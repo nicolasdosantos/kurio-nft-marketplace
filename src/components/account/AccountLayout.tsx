@@ -61,8 +61,8 @@ export function AccountLayout({ section, children }: AccountLayoutProps) {
 
   if (isDesktop) {
     return (
-      // 41px: compensa o header do app, mais baixo que o dos frames (como no Pagamento).
-      <main className="mx-auto grid w-full max-w-[1232px] grid-cols-[310px_minmax(0,1fr)] items-start gap-7 px-4 pt-[41px]">
+      // No desktop, 33px abaixo da linha do header, como nos frames do Figma.
+      <main className="mx-auto grid w-full max-w-[1232px] grid-cols-[310px_minmax(0,1fr)] items-start gap-7 px-4 pt-[41px] md:pt-[33px]">
         <nav
           aria-label="Menu da conta"
           className="flex flex-col bg-surface-card pt-[14px] pb-[7px]"
