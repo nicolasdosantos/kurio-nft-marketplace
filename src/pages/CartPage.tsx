@@ -241,7 +241,7 @@ export function CartPage() {
   if (!isTabletUp) {
     return (
       <main className="flex flex-col gap-3 pt-8">
-        <div className="relative flex h-11 items-start justify-center px-7">
+        <div className="relative flex h-11 items-start justify-center px-[70px]">
           <button
             type="button"
             aria-label="Voltar"
@@ -250,7 +250,7 @@ export function CartPage() {
           >
             <img src="/icons/arrow-left.svg" alt="" width={20} height={20} />
           </button>
-          <h1 className="pt-[9px] text-[20px] leading-4 font-bold text-foreground">
+          <h1 className="pt-[5px] text-[20px] leading-6 font-bold text-foreground">
             Carrinho de NFTs
           </h1>
         </div>
@@ -487,7 +487,7 @@ function MobileCartLine(props: LineProps) {
         <LineIssues {...props} />
         <div className="mt-auto flex items-end justify-between gap-2 pt-2">
           <span
-            className="text-body-lg leading-4 font-bold text-text-accent"
+            className="text-body-lg leading-4 font-bold whitespace-nowrap text-text-accent"
             data-testid="line-total"
           >
             {line.lineTotalEth ? `${line.lineTotalEth} ETH` : <Skeleton className="h-4 w-20" />}

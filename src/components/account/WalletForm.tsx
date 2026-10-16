@@ -178,7 +178,7 @@ export function WalletForm({
         <button
           type="submit"
           disabled={saveWallet.isPending}
-          className="flex h-10 items-center rounded-[3px] bg-primary px-4 text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60"
+          className="flex h-10 items-center rounded-[3px] bg-primary px-4 text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60 max-md:rounded-full max-md:px-5"
         >
           {saveWallet.isPending ? 'Salvando...' : 'Salvar carteira'}
         </button>

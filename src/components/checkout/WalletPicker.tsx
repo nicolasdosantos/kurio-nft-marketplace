@@ -56,7 +56,7 @@ export function WalletStatus({
 }: WalletStatusProps) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <h2 data-testid="wallet-status" className="text-body-md leading-4 font-bold">
+      <h2 data-testid="wallet-status" className="text-body-md leading-5 font-bold">
         {connected ? 'Carteira conectada' : 'Carteira desconectada'}
       </h2>
       {connected ? (

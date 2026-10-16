@@ -23,7 +23,7 @@ function readFileAsDataUrl(file: File) {
 }
 
 const primaryButton =
-  'flex h-10 items-center justify-center rounded-[3px] bg-primary px-6 text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60'
+  'flex h-10 items-center justify-center rounded-[3px] bg-primary px-6 max-md:rounded-full text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60'
 const textButton =
   'flex h-10 items-center px-2 text-body leading-4 text-foreground hover:text-text-accent disabled:opacity-60'
 

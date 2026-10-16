@@ -58,10 +58,11 @@ export function SiteHeader() {
 
   return (
     <header className="mx-auto hidden w-full max-w-[1232px] px-4 pt-6 md:block">
-      <div className="flex items-start justify-between">
+      {/* Grade de 3 colunas: o menu fica no centro, seja qual for a largura do botão da direita. */}
+      <div className="grid grid-cols-[1fr_auto_1fr] items-start">
         <Link
           to="/"
-          className="pt-2 text-body-sm font-bold tracking-[1.4px] text-foreground lg:w-40"
+          className="justify-self-start pt-2 text-body-sm font-bold tracking-[1.4px] text-foreground lg:w-40"
         >
           KURIO
         </Link>
@@ -80,7 +81,7 @@ export function SiteHeader() {
           <ComingSoon className="text-foreground">Aprenda</ComingSoon>
         </nav>
 
-        <div className="flex items-center gap-5 lg:gap-7">
+        <div className="flex items-center gap-5 justify-self-end lg:gap-7">
           <button
             type="button"
             aria-label="Abrir busca"
@@ -98,15 +99,17 @@ export function SiteHeader() {
             className="relative grid size-6 place-items-start rounded-sm"
           >
             <img src="/icons/cart.svg" alt="" width={24} height={24} />
-            <span
-              key={cartBump}
-              className={cn(
-                'absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink',
-                cartBump > 0 && 'animate-bump',
-              )}
-            >
-              <span data-testid="cart-count">{cartCount}</span>
-            </span>
+            {cartCount > 0 && (
+              <span
+                key={cartBump}
+                className={cn(
+                  'absolute -top-1 left-[15px] grid size-4 place-items-center rounded-full bg-primary text-tiny font-medium text-ink outline-2 outline-ink',
+                  cartBump > 0 && 'animate-bump',
+                )}
+              >
+                <span data-testid="cart-count">{cartCount}</span>
+              </span>
+            )}
           </Link>
 
           {session.restoring ? (

@@ -33,6 +33,9 @@ function RootLayout() {
   const isTabletUp = useMediaQuery('(min-width: 768px)')
   // Telas cujo Figma mobile não tem tab bar: no detalhe e no carrinho a barra de compra
   // e o resumo ficam no lugar dela; login e cadastro são páginas inteiras.
+  const isDetailPage = useRouterState({
+    select: (state) => state.location.pathname.startsWith('/nft/'),
+  })
   const hideTabBar = useRouterState({
     select: (state) => {
       const { pathname } = state.location
@@ -56,7 +59,7 @@ function RootLayout() {
       <div id="conteudo" tabIndex={-1} className="outline-none">
         <Outlet />
       </div>
-      <SiteFooter />
+      <SiteFooter reserveBottomBar={!isTabletUp && (!hideTabBar || isDetailPage)} />
       {!isTabletUp && !hideTabBar && <MobileTabBar />}
       <span className="sr-only">
         Tempo real:{' '}

@@ -127,7 +127,7 @@ export function AuthLayout({
             aria-label="Fechar"
             className="absolute top-2 right-[9px] grid size-6 place-items-center text-primary"
           >
-            <XIcon aria-hidden="true" className="size-3" strokeWidth={2.5} />
+            <XIcon aria-hidden="true" className="size-4" strokeWidth={2} />
           </DialogClose>
 
           <DialogTitle className="sr-only">

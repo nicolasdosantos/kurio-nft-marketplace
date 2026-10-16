@@ -331,7 +331,7 @@ function WalletCard({
               type="button"
               onClick={() => setConfirmingRemoval(true)}
               disabled={busy}
-              className="text-body-md leading-4 text-foreground hover:text-destructive disabled:opacity-60"
+              className="text-body-md leading-4 text-destructive underline-offset-4 hover:underline disabled:opacity-60"
             >
               Remover carteira secundária
             </button>

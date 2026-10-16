@@ -27,7 +27,7 @@ export function NftDetailPage({ nftId }: { nftId: string }) {
 
   if (nftQuery.isPending) {
     return (
-      <main className={isTabletUp ? 'mx-auto w-full max-w-[1232px] px-4 pt-8' : undefined}>
+      <main className={isTabletUp ? 'mx-auto w-full max-w-[1232px] px-4 pt-[41px]' : undefined}>
         <h1 className="sr-only">Carregando NFT</h1>
         <NftDetailSkeleton isTabletUp={isTabletUp} />
       </main>
@@ -340,7 +340,7 @@ function NftDetailContent({ nft, isTabletUp }: { nft: Nft; isTabletUp: boolean }
   }
 
   return (
-    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-8">
+    <main className="mx-auto flex w-full max-w-[1232px] flex-col gap-24 px-4 pt-[41px]">
       <div className="flex flex-col gap-3">
         <nav aria-label="Trilha de navegação" className="text-body leading-4 font-bold">
           <Link to="/" className="hover:underline">

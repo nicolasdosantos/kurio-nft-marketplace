@@ -557,7 +557,7 @@ export function CheckoutPage() {
           >
             <img src="/icons/arrow-left.svg" alt="" width={20} height={20} />
           </button>
-          <h1 className="pt-[9px] text-[20px] leading-4 font-bold">Pagamento com carteira</h1>
+          <h1 className="pt-[5px] text-[20px] leading-6 font-bold">Pagamento com carteira</h1>
         </div>
         {content}
       </main>

@@ -64,10 +64,10 @@ export function NftCard({ nft }: { nft: NftSummary }) {
             {nft.name}
           </Link>
         </h3>
-        <p className="flex items-center gap-3 text-body-md font-bold text-text-accent md:text-body-lg">
-          <span>{nft.priceEth} ETH</span>
+        <p className="flex flex-wrap items-center gap-x-3 text-body-md font-bold text-text-accent md:text-body-lg">
+          <span className="whitespace-nowrap">{nft.priceEth} ETH</span>
           {nft.originalPriceEth && (
-            <s className="font-normal text-secondary">
+            <s className="font-normal whitespace-nowrap text-secondary">
               <span className="sr-only">Preço original: </span>
               {nft.originalPriceEth} ETH
             </s>

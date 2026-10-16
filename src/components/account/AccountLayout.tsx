@@ -102,7 +102,7 @@ export function AccountLayout({ section, children }: AccountLayoutProps) {
     >
       {!isTabletUp && (
         <div className="flex h-11 items-start justify-between gap-4">
-          <p className="pt-[9px] text-[20px] leading-4 font-bold">Meu perfil</p>
+          <p className="pt-[5px] text-[20px] leading-6 font-bold">Meu perfil</p>
           <button
             type="button"
             onClick={logout.leave}

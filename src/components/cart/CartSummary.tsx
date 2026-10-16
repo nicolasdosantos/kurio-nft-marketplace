@@ -138,7 +138,7 @@ export function CartSummary({
         data-testid="cart-summary"
         aria-busy={quoteUpdating}
         className={cn(
-          'flex flex-col gap-3 text-body leading-5 text-foreground',
+          'mt-3 flex flex-col gap-3 text-body leading-5 text-foreground',
           quoteUpdating && 'opacity-60',
         )}
       >
@@ -153,7 +153,7 @@ export function CartSummary({
             {/* A "Taxa estimada" fica dentro do dd: num <dl> só cabem dt e dd. */}
             <div className="flex items-start justify-between gap-4">
               <dt>Taxa de rede</dt>
-              <dd className="flex flex-col items-end">
+              <dd className="flex flex-col items-end gap-3">
                 <span className={cn(style.value, 'leading-5')}>{quote.networkFeeEth} ETH</span>
                 <span className="text-caption-sm leading-4 text-text-accent">
                   Taxa estimada (Ethereum)

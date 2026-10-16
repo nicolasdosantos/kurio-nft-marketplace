@@ -31,7 +31,7 @@ const passwordFormSchema = changePasswordRequestSchema
 type PasswordForm = z.infer<typeof passwordFormSchema>
 
 const saveButton =
-  'flex h-10 min-w-[131px] items-center justify-center self-start rounded-[3px] bg-primary px-5 text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60'
+  'flex h-10 min-w-[131px] items-center justify-center self-start rounded-[3px] bg-primary px-5 max-md:rounded-full text-body leading-4 font-bold text-ink hover:bg-text-accent disabled:opacity-60'
 
 export function ProfilePage() {
   const profileQuery = useProfile()

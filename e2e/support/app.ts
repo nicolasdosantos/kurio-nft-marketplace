@@ -82,10 +82,10 @@ export async function logoutThroughUi(page: Page) {
   await waitForApiIdle()
 }
 
-// No mobile o badge some quando o carrinho está vazio.
+// Com o carrinho vazio o contador some (no header e na tab bar).
 export async function expectCartCount(page: Page, count: number) {
   const visibleBadge = page.getByTestId('cart-count').filter({ visible: true })
-  if (count === 0 && !isDesktopLayout(page)) {
+  if (count === 0) {
     await expect(visibleBadge).toHaveCount(0)
   } else {
     await expect(visibleBadge).toHaveText(String(count))

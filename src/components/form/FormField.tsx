@@ -254,7 +254,7 @@ export function FormTextarea({
   const errorId = `${id}-error`
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      <label htmlFor={id} className="text-body leading-[15px]">
+      <label htmlFor={id} className="text-body leading-5">
         {label}
       </label>
       <textarea
